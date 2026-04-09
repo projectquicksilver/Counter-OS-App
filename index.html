@@ -1,0 +1,1435 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>CounterOS – Har Scan Pe Inaam</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1" rel="stylesheet"/>
+<script>
+tailwind.config={darkMode:"class",theme:{extend:{colors:{"surface-container-lowest":"#000000","surface-container":"#161b19","primary-container":"#52b555","secondary":"#86faac","tertiary":"#90f1ff","primary-fixed":"#91f78e","on-secondary":"#005f32","surface-container-high":"#1b211f","surface-bright":"#272d2c","surface-dim":"#0b0f0e","background":"#0b0f0e","on-background":"#fafdfa","surface":"#0b0f0e","on-primary-container":"#002a06","error":"#ff7351","on-surface":"#fafdfa","secondary-container":"#006d3a","on-tertiary":"#005b64","surface-container-highest":"#212725","surface-container-low":"#101413","outline-variant":"#454947","outline":"#727675","primary":"#91f78e","on-primary":"#005e17"},fontFamily:{headline:["Manrope"],body:["Inter"],label:["Inter"]}}}}
+</script>
+<style>
+:root{--primary:#91f78e;--primary-dark:#52b555;--surface:#0b0f0e;--surface-low:#101413;--surface-high:#1b211f;--surface-highest:#212725;--on-surface:#fafdfa;--on-surface-variant:#a8acaa;--outline-variant:#454947;--secondary:#86faac;--tertiary:#90f1ff;--gold:#FFD700}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{background:var(--surface);color:var(--on-surface);font-family:'Inter',sans-serif;overflow-x:hidden;min-height:100vh}
+.material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;display:inline-block;line-height:1;vertical-align:middle}
+.screen{display:none;position:fixed;inset:0;overflow-y:auto;overflow-x:hidden;background:var(--surface);z-index:10;flex-direction:column}
+.screen.active{display:flex}
+.slide-in{animation:slideIn .28s cubic-bezier(.4,0,.2,1) forwards}
+.slide-back{animation:slideBack .28s cubic-bezier(.4,0,.2,1) forwards}
+@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes slideBack{from{transform:translateX(-30%);opacity:0}to{transform:translateX(0);opacity:1}}
+.btn-primary{background:linear-gradient(135deg,#91f78e,#52b555);color:#005e17;font-family:'Manrope',sans-serif;font-weight:700;border-radius:.75rem;padding:1rem 1.5rem;width:100%;display:flex;align-items:center;justify-content:center;gap:.5rem;cursor:pointer;transition:all .15s;border:none;font-size:1rem;box-shadow:0 8px 20px rgba(82,181,85,.2)}
+.btn-primary:active{transform:scale(.97)}
+.btn-secondary{background:var(--surface-high);color:var(--on-surface);font-family:'Manrope',sans-serif;font-weight:600;border-radius:.75rem;padding:.875rem 1.5rem;width:100%;display:flex;align-items:center;justify-content:center;gap:.5rem;cursor:pointer;transition:all .15s;border:1px solid rgba(69,73,71,.3);font-size:.9rem}
+.btn-secondary:active{transform:scale(.97)}
+.btn-gold{background:linear-gradient(135deg,#FFD700,#B8860B);color:#003300;font-family:'Manrope',sans-serif;font-weight:800;border-radius:1rem;padding:1.1rem 1.5rem;width:100%;display:flex;align-items:center;justify-content:center;gap:.5rem;cursor:pointer;transition:all .15s;border:none;font-size:1.1rem;box-shadow:0 8px 25px rgba(212,175,55,.25)}
+.btn-gold:active{transform:scale(.97)}
+.obsidian-card{background:linear-gradient(145deg,#121812,#0d120d);border:1px solid #1f291f;border-radius:1rem}
+.glass-card{background:rgba(27,33,31,.6);backdrop-filter:blur(20px);border:1px solid rgba(69,73,71,.3);border-radius:1rem}
+.surface-card{background:var(--surface-low);border:1px solid rgba(69,73,71,.2);border-radius:1rem}
+.input-field{background:var(--surface-highest);border:1px solid rgba(69,73,71,.3);border-radius:.75rem;padding:.9rem 1rem;color:var(--on-surface);width:100%;outline:none;font-family:'Inter',sans-serif;font-size:.95rem;transition:border-color .15s}
+.input-field:focus{border-color:var(--primary)}
+.input-label{font-family:'Inter',sans-serif;font-size:.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--on-surface-variant);margin-bottom:.4rem;display:block}
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:var(--surface-high);border-top:1px solid rgba(69,73,71,.3);display:flex;z-index:100}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:.6rem .25rem;gap:.15rem;cursor:pointer;transition:all .15s;color:var(--on-surface-variant);background:none;border:none;font-family:'Inter',sans-serif;font-size:.6rem;font-weight:600}
+.nav-btn.active{color:var(--primary)}
+.nav-btn:active{transform:scale(.9)}
+.nav-btn .material-symbols-outlined{font-size:22px}
+.nav-btn.active .material-symbols-outlined{font-variation-settings:'FILL' 1,'wght' 600,'GRAD' 0,'opsz' 24}
+.scanner-line{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--primary),transparent);animation:scanLine 2s linear infinite;box-shadow:0 0 12px var(--primary)}
+@keyframes scanLine{0%{top:15%}100%{top:85%}}
+.scanner-corner{position:absolute;width:24px;height:24px}
+.corner-tl{top:12px;left:12px;border-top:3px solid var(--primary);border-left:3px solid var(--primary)}
+.corner-tr{top:12px;right:12px;border-top:3px solid var(--primary);border-right:3px solid var(--primary)}
+.corner-bl{bottom:12px;left:12px;border-bottom:3px solid var(--primary);border-left:3px solid var(--primary)}
+.corner-br{bottom:12px;right:12px;border-bottom:3px solid var(--primary);border-right:3px solid var(--primary)}
+.otp-input{width:2.75rem;height:3.25rem;background:var(--surface-highest);border:2px solid rgba(69,73,71,.3);border-radius:.75rem;text-align:center;font-size:1.4rem;font-weight:700;font-family:'Manrope',sans-serif;color:var(--primary);outline:none;transition:border-color .15s}
+.otp-input:focus,.otp-input.filled{border-color:var(--primary);background:rgba(145,247,142,.06)}
+.progress-bar{height:6px;background:var(--surface-highest);border-radius:9999px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,#91f78e,#52b555);border-radius:9999px;transition:width .8s cubic-bezier(.4,0,.2,1);box-shadow:0 0 10px rgba(145,247,142,.3)}
+#toast{position:fixed;bottom:5rem;left:50%;transform:translateX(-50%) translateY(100px);background:var(--surface-highest);color:var(--on-surface);padding:.75rem 1.25rem;border-radius:.75rem;font-size:.85rem;font-weight:500;z-index:9999;border:1px solid rgba(69,73,71,.4);transition:transform .3s cubic-bezier(.4,0,.2,1);white-space:nowrap;pointer-events:none;box-shadow:0 10px 30px rgba(0,0,0,.4);max-width:90vw}
+#toast.show{transform:translateX(-50%) translateY(0)}
+.gold-glow{text-shadow:0 0 15px rgba(255,215,0,.4)}
+.page-content{padding-bottom:5.5rem}
+.select-card{background:var(--surface-high);border:2px solid rgba(69,73,71,.3);border-radius:1rem;padding:1.1rem;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:1rem}
+.select-card:active{transform:scale(.98)}
+.select-card.selected{border-color:var(--primary);background:rgba(145,247,142,.04)}
+.amount-btn{padding:.75rem;background:var(--surface-high);border:1px solid rgba(69,73,71,.3);border-radius:.75rem;color:var(--on-surface);font-weight:600;cursor:pointer;transition:all .15s;text-align:center;font-family:'Inter',sans-serif}
+.amount-btn.selected{border-color:var(--primary);background:rgba(145,247,142,.08);color:var(--primary)}
+.amount-btn:active{transform:scale(.95)}
+.tab-btn{flex:1;padding:.5rem;border-radius:.5rem;font-size:.72rem;font-weight:600;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:.3rem;border:none;background:transparent;color:var(--on-surface-variant)}
+.tab-btn.active{background:rgba(145,247,142,.15);color:var(--primary);border:1px solid rgba(145,247,142,.3)}
+.qty-btn{width:2.5rem;height:2.5rem;border-radius:.5rem;background:var(--surface-highest);border:1px solid rgba(69,73,71,.3);color:var(--primary);font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .1s;font-family:'Manrope',sans-serif}
+.qty-btn:active{transform:scale(.88);background:rgba(145,247,142,.1)}
+.upload-zone{border:2px dashed rgba(145,247,142,.35);border-radius:1rem;background:rgba(145,247,142,.03);padding:2.5rem 1.5rem;text-align:center;cursor:pointer;transition:all .2s}
+.upload-zone:hover{border-color:var(--primary);background:rgba(145,247,142,.06)}
+.tx-item{display:flex;align-items:center;gap:.75rem;padding:.9rem 0;border-bottom:1px solid rgba(69,73,71,.15)}
+.tx-item:last-child{border-bottom:none}
+@keyframes pulse-fire{0%,100%{box-shadow:0 0 10px rgba(145,247,142,.3)}50%{box-shadow:0 0 25px rgba(145,247,142,.6)}}
+.fire-day{animation:pulse-fire 2s ease-in-out infinite}
+#confettiCanvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:200;display:none}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(69,73,71,.4);border-radius:4px}
+.app-wrapper{max-width:480px;margin:0 auto;position:relative;min-height:100vh;overflow-x:hidden}
+</style>
+</head>
+<body>
+<canvas id="confettiCanvas"></canvas>
+<div id="toast"></div>
+<div class="app-wrapper" id="app">
+
+<!-- SCREEN 1: LOGIN -->
+<div class="screen active" id="screen-login">
+<main class="flex-1 flex flex-col items-center justify-center px-6 py-10 min-h-screen">
+<div class="w-full max-w-sm mx-auto">
+<div class="relative w-full mb-8 rounded-2xl overflow-hidden bg-surface-container-low" style="aspect-ratio:1;border:1px solid rgba(69,73,71,.15)">
+<img src="https://lh3.googleusercontent.com/aida-public/AB6AXuA0SrOgsq8xziyRTNcYcUuYZWxh5NZFGe4JDP-q-GD813tacSKDk56kTi0sUExRtB257G6NnMnwqA27UKDTBbTaooO45kuDLZ5PMKp2Lu2kLA3qAZDi7SaRfP9yiqhKPwUDQdufGcsR1_lOF0u91QfcFORhw9GZTuzaLFPwNdGjbQ6MD1Aohsj7pu64fkpBjRvGMW3qyKbDBkvIVflHSdFeBajKpjI7qHIsa93tT51v15P4yHfY8QdTPpsOJvFuyxPQkQZQQLBKueIO" class="w-full h-full object-cover" style="opacity:.8;mix-blend-mode:luminosity" alt="CounterOS"/>
+<div style="position:absolute;inset:0;background:linear-gradient(to top,var(--surface),transparent)"></div>
+<div style="position:absolute;bottom:-12px;left:50%;transform:translateX(-50%);padding:.4rem 1rem;background:var(--surface-high);border-radius:9999px;border:1px solid rgba(69,73,71,.2);display:flex;align-items:center;gap:.4rem;box-shadow:0 8px 20px rgba(0,0,0,.4)">
+<span class="material-symbols-outlined text-secondary" style="font-size:14px;font-variation-settings:'FILL' 1">verified_user</span>
+<span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--on-surface-variant)">Secure &amp; Encrypted</span>
+</div>
+</div>
+<div class="text-center mt-6 mb-8">
+<div class="flex items-center justify-center gap-2 mb-1">
+<span class="material-symbols-outlined text-primary" style="font-size:2rem">eco</span>
+<h1 class="font-headline text-4xl font-bold">CounterOS</h1>
+</div>
+<p class="text-secondary font-medium tracking-wide">Har scan pe inaam</p>
+</div>
+<div class="space-y-4">
+<div>
+<label class="input-label">Mobile Number</label>
+<div class="flex gap-2">
+<div style="width:4.5rem;background:var(--surface-highest);border:1px solid rgba(69,73,71,.3);border-radius:.75rem;display:flex;align-items:center;justify-content:center;padding:.9rem .75rem;font-weight:600;flex-shrink:0"><span style="color:var(--on-surface-variant)">+</span>91</div>
+<input class="input-field flex-1" type="tel" placeholder="Enter your number" id="loginPhone" maxlength="10"/>
+</div>
+</div>
+<button class="btn-primary" onclick="handleLogin()">Send OTP <span class="material-symbols-outlined">arrow_forward</span></button>
+<div id="otpSection" style="display:none" class="space-y-3">
+<div>
+<label class="input-label">OTP sent to your number</label>
+<div class="flex gap-2 justify-between">
+<input class="otp-input" maxlength="1" type="text" inputmode="numeric" oninput="otpNext(this,'otp2')" id="otp1"/>
+<input class="otp-input" maxlength="1" type="text" inputmode="numeric" oninput="otpNext(this,'otp3')" id="otp2"/>
+<input class="otp-input" maxlength="1" type="text" inputmode="numeric" oninput="otpNext(this,'otp4')" id="otp3"/>
+<input class="otp-input" maxlength="1" type="text" inputmode="numeric" oninput="otpNext(this,null)" id="otp4"/>
+</div>
+<p style="font-size:.75rem;color:var(--on-surface-variant);margin-top:.4rem">Demo OTP: <strong style="color:var(--primary)">1234</strong></p>
+</div>
+<button class="btn-primary" onclick="verifyOTP()">Verify &amp; Login</button>
+</div>
+<div class="flex items-center gap-4 py-2">
+<div style="height:1px;flex:1;background:rgba(69,73,71,.2)"></div>
+<span style="font-size:10px;font-weight:700;color:rgba(168,172,170,.5);text-transform:uppercase;letter-spacing:.1em">Or continue with</span>
+<div style="height:1px;flex:1;background:rgba(69,73,71,.2)"></div>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<button class="btn-secondary" onclick="navigate('screen-setup-shop')"><span style="font-size:1.1rem;font-weight:900">G</span> Google</button>
+<button class="btn-secondary" onclick="navigate('screen-setup-shop')"><span class="material-symbols-outlined" style="color:#25D366;font-variation-settings:'FILL' 1">chat</span> WhatsApp</button>
+</div>
+</div>
+<div class="grid grid-cols-3 gap-2 mt-10">
+<div class="text-center p-3 rounded-xl" style="background:rgba(16,20,19,.5)"><span class="material-symbols-outlined text-tertiary mb-1" style="font-size:20px">account_balance_wallet</span><p style="font-size:10px;font-weight:700;line-height:1.3">Instant Payouts</p></div>
+<div class="text-center p-3 rounded-xl" style="background:rgba(16,20,19,.5)"><span class="material-symbols-outlined text-secondary mb-1" style="font-size:20px">verified</span><p style="font-size:10px;font-weight:700;line-height:1.3">Secure &amp; Trusted</p></div>
+<div class="text-center p-3 rounded-xl" style="background:rgba(16,20,19,.5)"><span class="material-symbols-outlined text-primary mb-1" style="font-size:20px">redeem</span><p style="font-size:10px;font-weight:700;line-height:1.3">Inaam Har Sale</p></div>
+</div>
+</div>
+</main>
+</div>
+
+<!-- SCREEN 2: SETUP SHOP -->
+<div class="screen" id="screen-setup-shop">
+<header class="sticky top-0 z-50 flex items-center justify-between px-5 py-4" style="background:var(--surface-low)">
+<div class="flex items-center gap-2"><span class="material-symbols-outlined text-primary">eco</span><span class="font-headline font-bold">CounterOS</span></div>
+<button style="font-size:.85rem;color:var(--on-surface-variant);font-weight:500;background:none;border:none;cursor:pointer">Help</button>
+</header>
+<div class="flex gap-1.5 px-5 mt-3" style="height:4px">
+<div style="flex:1;background:var(--primary);border-radius:9999px"></div>
+<div style="flex:1;background:var(--surface-highest);border-radius:9999px"></div>
+<div style="flex:1;background:var(--surface-highest);border-radius:9999px"></div>
+<div style="flex:1;background:var(--surface-highest);border-radius:9999px"></div>
+<div style="flex:1;background:var(--surface-highest);border-radius:9999px"></div>
+<div style="flex:1;background:var(--surface-highest);border-radius:9999px"></div>
+</div>
+<main class="px-5 py-6 page-content">
+<div style="display:inline-flex;align-items:center;gap:.4rem;padding:.25rem .75rem;border-radius:9999px;background:var(--surface-highest);border:1px solid rgba(69,73,71,.2);margin-bottom:1rem">
+<span class="material-symbols-outlined text-secondary" style="font-size:14px;font-variation-settings:'FILL' 1">verified_user</span>
+<span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--on-surface-variant)">Step 1 of 6</span>
+</div>
+<h1 class="font-headline text-3xl font-bold mb-2">Let's Set Up Your Shop</h1>
+<p style="color:var(--on-surface-variant);font-size:.9rem;line-height:1.6;margin-bottom:1.5rem">Fill out your shop details to unlock rewards for every verified sale.</p>
+<div class="space-y-4">
+<div><label class="input-label">Shop Name</label><input class="input-field" type="text" value="Ramesh Agro Store"/></div>
+<div><label class="input-label">Owner Name</label><input class="input-field" type="text" value="Ramesh Kumar Sharma"/></div>
+<div><label class="input-label">Shop Category</label><select class="input-field" style="appearance:none"><option>Agri Input Dealer</option><option>General Kirana</option><option>Fertilizer &amp; Pesticide</option></select></div>
+<div><label class="input-label">Location / Village</label><input class="input-field" type="text" value="Khetgaon, Madhya Pradesh"/></div>
+<div><label class="input-label">Mobile Number</label><input class="input-field" type="tel" value="+91 98XXXXXXXX45" readonly/></div>
+</div>
+<button class="btn-primary mt-6" onclick="navigate('screen-verify-business')">Save &amp; Continue <span class="material-symbols-outlined">arrow_forward</span></button>
+</main>
+</div>
+
+<!-- SCREEN 3: VERIFY BUSINESS -->
+<div class="screen" id="screen-verify-business">
+<header class="sticky top-0 z-50 flex items-center justify-between px-5 py-4" style="background:var(--surface-low)">
+<button onclick="goBack()"><span class="material-symbols-outlined text-on-surface-variant">arrow_back</span></button>
+<span class="font-headline font-bold">Verify Business</span>
+<button onclick="navigate('screen-setup-shop',true)"><span class="material-symbols-outlined text-on-surface-variant">close</span></button>
+</header>
+<div class="flex gap-1.5 px-5 mt-2" style="height:4px">
+<div style="flex:1;background:var(--primary);border-radius:9999px"></div>
+<div style="flex:1;background:var(--primary);border-radius:9999px"></div>
+<div style="flex:1;background:var(--surface-highest);border-radius:9999px"></div>
+<div style="flex:1;background:var(--surface-highest);border-radius:9999px"></div>
+<div style="flex:1;background:var(--surface-highest);border-radius:9999px"></div>
+<div style="flex:1;background:var(--surface-highest);border-radius:9999px"></div>
+</div>
+<main class="px-5 py-6 page-content">
+<h1 class="font-headline text-3xl font-bold mb-2">Verify Your Business</h1>
+<p style="color:var(--on-surface-variant);font-size:.9rem;margin-bottom:1.5rem">Upload proof of your business to unlock higher limits.</p>
+<div class="space-y-3 mb-5">
+<div class="select-card selected" id="docGST" onclick="selectDoc('GST')">
+<div style="width:2.5rem;height:2.5rem;border-radius:.5rem;background:rgba(145,247,142,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="material-symbols-outlined text-primary" style="font-size:20px">receipt_long</span></div>
+<div class="flex-1"><div class="font-medium">GST Certificate</div><div style="font-size:.75rem;color:var(--on-surface-variant)">Most common proof</div></div>
+<span class="material-symbols-outlined text-primary" style="font-variation-settings:'FILL' 1;font-size:18px" id="docGSTCheck">check_circle</span>
+</div>
+<div class="select-card" id="docMSME" onclick="selectDoc('MSME')">
+<div style="width:2.5rem;height:2.5rem;border-radius:.5rem;background:rgba(144,241,255,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="material-symbols-outlined text-tertiary" style="font-size:20px">business</span></div>
+<div class="flex-1"><div class="font-medium">MSME / Udyam</div><div style="font-size:.75rem;color:var(--on-surface-variant)">For registered MSMEs</div></div>
+<span class="material-symbols-outlined" style="font-size:18px;color:var(--outline-variant)" id="docMSMECheck">radio_button_unchecked</span>
+</div>
+<div class="select-card" id="docPAN" onclick="selectDoc('PAN')">
+<div style="width:2.5rem;height:2.5rem;border-radius:.5rem;background:rgba(134,250,172,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="material-symbols-outlined text-secondary" style="font-size:20px">badge</span></div>
+<div class="flex-1"><div class="font-medium">PAN Card</div><div style="font-size:.75rem;color:var(--on-surface-variant)">For unregistered shops</div></div>
+<span class="material-symbols-outlined" style="font-size:18px;color:var(--outline-variant)" id="docPANCheck">radio_button_unchecked</span>
+</div>
+</div>
+<div class="upload-zone mb-5" onclick="showToast('File picker opened (demo)')">
+<span class="material-symbols-outlined text-primary" style="font-size:2.5rem;margin-bottom:.75rem;display:block">cloud_upload</span>
+<p class="font-medium mb-1">Upload Document</p>
+<p style="font-size:.75rem;color:var(--on-surface-variant);margin-bottom:1rem">PDF, JPG or PNG (Max 10MB)</p>
+<div style="display:inline-flex;align-items:center;gap:.35rem;padding:.4rem 1rem;border:1px solid rgba(145,247,142,.4);border-radius:9999px;color:var(--primary);font-size:.8rem;font-weight:600"><span class="material-symbols-outlined" style="font-size:16px">attach_file</span> Browse Files</div>
+</div>
+<button class="btn-primary" onclick="navigate('screen-payout-setup')">Submit &amp; Continue <span class="material-symbols-outlined">arrow_forward</span></button>
+</main>
+</div>
+
+<!-- SCREEN 4: PAYOUT SETUP -->
+<div class="screen" id="screen-payout-setup">
+<header class="sticky top-0 z-50 flex items-center px-5 py-4 gap-3" style="background:var(--surface)">
+<button onclick="goBack()"><span class="material-symbols-outlined text-on-surface-variant">arrow_back</span></button>
+<div class="flex items-center gap-2 flex-1 justify-center"><span class="material-symbols-outlined text-primary">eco</span><span class="font-headline font-bold">CounterOS</span></div>
+<div style="width:28px"></div>
+</header>
+<div class="flex gap-1.5 px-5" style="height:6px">
+<div style="flex:1;background:var(--primary);border-radius:9999px"></div>
+<div style="flex:1;background:var(--primary);border-radius:9999px"></div>
+<div style="flex:1;background:var(--primary);border-radius:9999px"></div>
+<div style="flex:1;background:var(--primary);border-radius:9999px"></div>
+<div style="flex:1;background:var(--surface-highest);border-radius:9999px"></div>
+<div style="flex:1;background:var(--surface-highest);border-radius:9999px"></div>
+</div>
+<main class="px-5 py-6 page-content">
+<p style="font-size:.7rem;color:var(--on-surface-variant);font-weight:600;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.5rem">Step 4 of 6</p>
+<h1 class="font-headline text-2xl font-bold mb-2">Set Up Your Payout Account</h1>
+<p style="color:var(--on-surface-variant);font-size:.875rem;margin-bottom:1.5rem">Add your payout details to unlock rewards directly.</p>
+<div class="surface-card flex items-center gap-4 p-4 mb-5">
+<span class="material-symbols-outlined text-on-surface-variant">phone</span>
+<span style="font-size:1.05rem;font-weight:500">+91 | 98XXXXXXXX45</span>
+<div style="margin-left:auto;display:flex;align-items:center;gap:.35rem;color:var(--primary);font-size:.75rem;font-weight:700"><span class="material-symbols-outlined" style="font-size:14px;font-variation-settings:'FILL' 1">check_circle</span> Verified</div>
+</div>
+<div class="space-y-4 mb-6">
+<div><label class="input-label">UPI ID</label><input class="input-field" type="text" value="ramesh@upi"/></div>
+<div><label class="input-label">Link Type</label><select class="input-field" style="appearance:none"><option>UPI ID</option><option>Mobile (UPI)</option></select></div>
+</div>
+<button class="btn-primary" onclick="navigate('screen-payout-method')">Link &amp; Continue <span class="material-symbols-outlined">arrow_forward</span></button>
+</main>
+</div>
+
+<!-- SCREEN 5: SELECT PAYOUT METHOD -->
+<div class="screen" id="screen-payout-method">
+<header class="sticky top-0 z-50 flex items-center justify-between px-5 py-4" style="background:var(--surface)">
+<button onclick="goBack()"><span class="material-symbols-outlined text-on-surface-variant">arrow_back</span></button>
+<span class="font-headline font-bold">CounterOS</span>
+<button><span class="material-symbols-outlined text-on-surface-variant">help</span></button>
+</header>
+<div class="flex gap-1.5 px-5" style="height:4px">
+<div style="flex:1;background:var(--primary);border-radius:9999px"></div>
+<div style="flex:1;background:var(--primary);border-radius:9999px"></div>
+<div style="flex:1;background:var(--primary);border-radius:9999px"></div>
+<div style="flex:1;background:var(--primary);border-radius:9999px"></div>
+<div style="flex:1;background:var(--primary);border-radius:9999px"></div>
+<div style="flex:1;background:var(--surface-highest);border-radius:9999px"></div>
+</div>
+<main class="px-5 py-6 page-content">
+<p style="font-size:.7rem;color:var(--secondary);font-weight:600;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.5rem">Step 5 of 6</p>
+<h1 class="font-headline text-3xl font-bold mb-2">Select Payout Method</h1>
+<p style="color:var(--on-surface-variant);font-size:.9rem;margin-bottom:1.5rem">Choose how you'd like to receive your earnings.</p>
+<div class="space-y-3">
+<div class="select-card selected relative" id="payUPI" onclick="selectPayout('UPI')" style="border-color:var(--primary)">
+<div style="position:absolute;top:-.6rem;right:1rem;background:var(--primary);color:#005e17;font-size:9px;font-weight:700;padding:.15rem .5rem;border-radius:9999px;text-transform:uppercase">Recommended</div>
+<div style="width:3rem;height:3rem;border-radius:.75rem;background:rgba(145,247,142,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="material-symbols-outlined text-primary">account_balance_wallet</span></div>
+<div class="flex-1"><div class="font-headline font-bold">UPI / PhonePe / GPay</div><div style="font-size:.75rem;color:var(--on-surface-variant)">Instant transfer to any UPI</div></div>
+<span class="material-symbols-outlined text-primary" style="font-variation-settings:'FILL' 1" id="payUPICheck">check_circle</span>
+</div>
+<div class="select-card" id="payBank" onclick="selectPayout('Bank')">
+<div style="width:3rem;height:3rem;border-radius:.75rem;background:rgba(144,241,255,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="material-symbols-outlined text-tertiary">account_balance</span></div>
+<div class="flex-1"><div class="font-headline font-bold">Bank Transfer</div><div style="font-size:.75rem;color:var(--on-surface-variant)">Direct to bank, T+1</div></div>
+<span class="material-symbols-outlined" style="font-size:18px;color:var(--outline-variant)" id="payBankCheck">radio_button_unchecked</span>
+</div>
+<div class="select-card" id="payWallet" onclick="selectPayout('Wallet')">
+<div style="width:3rem;height:3rem;border-radius:.75rem;background:rgba(134,250,172,.1);display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="material-symbols-outlined text-secondary">savings</span></div>
+<div class="flex-1"><div class="font-headline font-bold">CounterOS Wallet</div><div style="font-size:.75rem;color:var(--on-surface-variant)">Hold &amp; spend in-app</div></div>
+<span class="material-symbols-outlined" style="font-size:18px;color:var(--outline-variant)" id="payWalletCheck">radio_button_unchecked</span>
+</div>
+</div>
+<button class="btn-primary mt-6" onclick="navigate('screen-bank-details')">Continue <span class="material-symbols-outlined">arrow_forward</span></button>
+</main>
+</div>
+
+<!-- SCREEN 6: BANK DETAILS -->
+<div class="screen" id="screen-bank-details">
+<header class="sticky top-0 z-50 flex items-center justify-between px-5 py-4" style="background:var(--surface)">
+<button onclick="goBack()"><span class="material-symbols-outlined text-on-surface-variant">arrow_back</span></button>
+<span class="font-headline font-bold">The Obsidian Ledger</span>
+<button><span class="material-symbols-outlined text-on-surface-variant">help</span></button>
+</header>
+<div class="flex gap-1.5 px-5" style="height:4px">
+<div style="flex:1;background:var(--primary);border-radius:9999px"></div>
+<div style="flex:1;background:var(--primary);border-radius:9999px"></div>
+<div style="flex:1;background:var(--primary);border-radius:9999px"></div>
+<div style="flex:1;background:var(--primary);border-radius:9999px"></div>
+<div style="flex:1;background:var(--primary);border-radius:9999px"></div>
+<div style="flex:1;background:var(--primary);border-radius:9999px"></div>
+</div>
+<main class="px-5 py-6 page-content">
+<div class="flex justify-between items-end mb-6">
+<div><p style="font-size:.7rem;color:var(--primary);font-weight:700;text-transform:uppercase;letter-spacing:.12em">Verification Phase</p><h1 class="font-headline text-2xl font-bold mt-1">Enter Bank Details</h1></div>
+<span style="font-size:.75rem;color:var(--on-surface-variant);font-weight:600">Step 6 of 6</span>
+</div>
+<div class="space-y-4 mb-6">
+<div><label class="input-label">Account Holder Name</label><input class="input-field" type="text" value="Ramesh Kumar Sharma"/></div>
+<div><label class="input-label">Account Number</label><input class="input-field" type="text" value="XXXX XXXX 4512"/></div>
+<div><label class="input-label">Confirm Account Number</label><input class="input-field" type="text" value="XXXX XXXX 4512"/></div>
+<div><label class="input-label">IFSC Code</label><input class="input-field" type="text" value="SBIN0041823"/></div>
+<div><label class="input-label">Bank Name</label><input class="input-field" type="text" value="State Bank of India" readonly style="color:var(--on-surface-variant)"/></div>
+</div>
+<button class="btn-primary" onclick="navigate('screen-payout-complete')">Verify &amp; Submit <span class="material-symbols-outlined">check</span></button>
+</main>
+</div>
+
+<!-- SCREEN 7: PAYOUT COMPLETE -->
+<div class="screen" id="screen-payout-complete">
+<main class="flex-1 flex flex-col items-center justify-center px-6 py-12 min-h-screen text-center">
+<div class="relative mb-8">
+<div style="position:absolute;inset:0;background:rgba(145,247,142,.2);border-radius:50%;filter:blur(40px)"></div>
+<div style="width:6rem;height:6rem;background:linear-gradient(135deg,#91f78e,#52b555);border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative;box-shadow:0 0 50px rgba(145,247,142,.3)">
+<span class="material-symbols-outlined" style="font-size:3rem;color:#005e17;font-variation-settings:'FILL' 1">check_circle</span>
+</div>
+</div>
+<h1 class="font-headline text-2xl font-bold mb-3">Payout Setup Complete</h1>
+<p style="color:var(--on-surface-variant);font-size:.9rem;max-width:280px;line-height:1.6;margin-bottom:2rem">Every verified sale will earn you money directly in your linked account.</p>
+<div class="surface-card w-full max-w-xs text-left p-5 mb-8">
+<div class="flex justify-between items-center mb-4">
+<span style="font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--on-surface-variant);font-weight:600">Account Details</span>
+<div style="display:flex;align-items:center;gap:.35rem;background:rgba(145,247,142,.1);padding:.2rem .6rem;border-radius:9999px"><span class="material-symbols-outlined" style="font-size:12px;color:var(--primary);font-variation-settings:'FILL' 1">verified</span><span style="font-size:10px;color:var(--primary);font-weight:700">Linked</span></div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between"><span style="font-size:.8rem;color:var(--on-surface-variant)">Account</span><span style="font-size:.8rem;font-weight:600">XXXX 4512</span></div>
+<div class="flex justify-between"><span style="font-size:.8rem;color:var(--on-surface-variant)">Bank</span><span style="font-size:.8rem;font-weight:600">SBI</span></div>
+<div class="flex justify-between"><span style="font-size:.8rem;color:var(--on-surface-variant)">Status</span><span style="font-size:.8rem;font-weight:600;color:var(--primary)">Active</span></div>
+</div>
+</div>
+<button class="btn-primary max-w-xs" onclick="navigate('screen-ready-to-earn')">Continue <span class="material-symbols-outlined">arrow_forward</span></button>
+</main>
+</div>
+
+<!-- SCREEN 8: READY TO EARN -->
+<div class="screen" id="screen-ready-to-earn">
+<main class="flex-1 flex flex-col items-center justify-center px-6 py-12 min-h-screen text-center">
+<div class="relative mb-8">
+<div style="position:absolute;inset:0;background:rgba(145,247,142,.2);border-radius:50%;filter:blur(60px);transform:scale(1.5)"></div>
+<div style="width:8rem;height:8rem;background:linear-gradient(135deg,#91f78e,#52b555);border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative;box-shadow:0 0 60px rgba(145,247,142,.4)">
+<span class="material-symbols-outlined" style="font-size:4rem;color:#005e17;font-variation-settings:'FILL' 1">check_circle</span>
+</div>
+</div>
+<h1 class="font-headline text-3xl font-bold mb-3">You're Now Ready to Earn 🚀</h1>
+<p style="color:var(--on-surface-variant);font-size:1rem;max-width:300px;line-height:1.6;margin-bottom:2rem">Your account is fully activated. Every verified sale will earn you money instantly.</p>
+<div class="surface-card w-full max-w-sm text-left p-5 mb-8 space-y-4">
+<div class="flex items-center gap-3"><div style="width:1.5rem;height:1.5rem;background:rgba(145,247,142,.1);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="material-symbols-outlined text-primary" style="font-size:14px">check</span></div><span class="font-medium">Mobile Verified</span></div>
+<div class="flex items-center gap-3"><div style="width:1.5rem;height:1.5rem;background:rgba(145,247,142,.1);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="material-symbols-outlined text-primary" style="font-size:14px">check</span></div><span class="font-medium">Shop Registered</span></div>
+<div class="flex items-center gap-3"><div style="width:1.5rem;height:1.5rem;background:rgba(145,247,142,.1);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="material-symbols-outlined text-primary" style="font-size:14px">check</span></div><span class="font-medium">Business Verified</span></div>
+<div class="flex items-center gap-3"><div style="width:1.5rem;height:1.5rem;background:rgba(145,247,142,.1);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="material-symbols-outlined text-primary" style="font-size:14px">check</span></div><span class="font-medium">Payout Account Linked</span></div>
+</div>
+<button class="btn-primary max-w-sm" onclick="navigate('screen-camera-access')">Start Earning! <span class="material-symbols-outlined">bolt</span></button>
+</main>
+</div>
+
+<!-- SCREEN 9: START FIRST EARNING -->
+<div class="screen" id="screen-start-earning">
+<header class="sticky top-0 z-50 flex items-center justify-between px-5 py-4" style="background:var(--surface-low)">
+<div class="flex items-center gap-2"><span class="material-symbols-outlined text-primary">fingerprint</span><span class="font-headline font-bold tracking-tighter">THE OBSIDIAN LEDGER</span></div>
+<button onclick="navigate('screen-camera-access')"><span class="material-symbols-outlined text-on-surface-variant">close</span></button>
+</header>
+<main class="px-5 py-6 page-content text-center">
+<h1 class="font-headline text-3xl font-bold mb-3 leading-tight">Start Your First Earning in 3 Steps</h1>
+<p style="color:var(--on-surface-variant);font-size:.875rem;max-width:280px;margin:0 auto 2rem">Complete these actions to activate your vault and start receiving rewards.</p>
+<div class="space-y-3 text-left mb-8">
+<div class="surface-card flex items-center gap-4 p-4">
+<div style="width:3.5rem;height:3.5rem;border-radius:.75rem;background:var(--surface-highest);display:flex;align-items:center;justify-content:center;border:1px solid rgba(69,73,71,.2);flex-shrink:0"><span class="material-symbols-outlined text-primary" style="font-size:1.75rem">barcode_scanner</span></div>
+<div><div class="font-headline font-bold">Scan a Product</div><div style="font-size:.8rem;color:var(--on-surface-variant)">Use camera to scan any agri product barcode</div></div>
+</div>
+<div class="surface-card flex items-center gap-4 p-4">
+<div style="width:3.5rem;height:3.5rem;border-radius:.75rem;background:var(--surface-highest);display:flex;align-items:center;justify-content:center;border:1px solid rgba(69,73,71,.2);flex-shrink:0"><span class="material-symbols-outlined text-secondary" style="font-size:1.75rem">point_of_sale</span></div>
+<div><div class="font-headline font-bold">Make a Verified Sale</div><div style="font-size:.8rem;color:var(--on-surface-variant)">Confirm with farmer OTP via WhatsApp</div></div>
+</div>
+<div class="surface-card flex items-center gap-4 p-4">
+<div style="width:3.5rem;height:3.5rem;border-radius:.75rem;background:var(--surface-highest);display:flex;align-items:center;justify-content:center;border:1px solid rgba(69,73,71,.2);flex-shrink:0"><span class="material-symbols-outlined text-tertiary" style="font-size:1.75rem">account_balance_wallet</span></div>
+<div><div class="font-headline font-bold">Collect Your Reward</div><div style="font-size:.8rem;color:var(--on-surface-variant)">Instantly credited to your CounterOS wallet</div></div>
+</div>
+</div>
+<button class="btn-primary" onclick="navigate('screen-camera-access')">Allow Camera Access <span class="material-symbols-outlined">camera</span></button>
+</main>
+</div>
+
+<!-- SCREEN 10: CAMERA ACCESS -->
+<div class="screen" id="screen-camera-access">
+<main class="flex-1 flex flex-col items-center justify-center px-8 min-h-screen text-center">
+<div class="relative mb-10">
+<div style="position:absolute;inset:0;background:rgba(145,247,142,.2);border-radius:50%;filter:blur(60px);transform:scale(1.5)"></div>
+<div style="position:relative;width:12rem;height:12rem;background:var(--surface-high);border-radius:50%;display:flex;align-items:center;justify-content:center;border:1px solid rgba(69,73,71,.2);box-shadow:0 0 40px rgba(145,247,142,.15)">
+<div style="width:10rem;height:10rem;background:var(--surface-highest);border-radius:50%;display:flex;align-items:center;justify-content:center">
+<span class="material-symbols-outlined text-primary" style="font-size:4.5rem;font-variation-settings:'FILL' 1">photo_camera</span>
+</div>
+<div style="position:absolute;top:-.5rem;right:-.5rem;background:rgba(134,250,172,.15);padding:.6rem;border-radius:.75rem;backdrop-filter:blur(8px);border:1px solid rgba(134,250,172,.3)">
+<span class="material-symbols-outlined text-secondary" style="font-size:1.4rem">qr_code_scanner</span>
+</div>
+</div>
+</div>
+<div class="space-y-3 mb-10 max-w-xs">
+<h1 class="font-headline text-3xl font-bold">Enable Camera Access</h1>
+<p style="color:var(--on-surface-variant);line-height:1.6">We need camera access to scan products and track your sales in real time.</p>
+</div>
+<div class="w-full max-w-xs space-y-3">
+<button class="btn-primary" onclick="navigate('screen-home')"><span class="material-symbols-outlined">camera_alt</span> Allow Camera Access</button>
+<button class="btn-secondary" onclick="navigate('screen-home')">Not Now</button>
+</div>
+<div class="surface-card mt-8 p-4 max-w-xs w-full text-left">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary" style="font-size:18px;flex-shrink:0;margin-top:2px;font-variation-settings:'FILL' 1">lock</span>
+<p style="font-size:.75rem;color:var(--on-surface-variant);line-height:1.5">Your camera is only used for scanning. No photos are stored without permission.</p>
+</div>
+</div>
+</main>
+</div>
+
+<!-- SCREEN 11: HOME -->
+<div class="screen" id="screen-home">
+<header class="flex justify-between items-center p-5">
+<div class="flex items-center gap-3">
+<div style="width:3rem;height:3rem;border-radius:50%;overflow:hidden;border:2px solid rgba(69,73,71,.4);background:var(--surface-high)"><span class="material-symbols-outlined" style="font-size:2rem;color:#a8acaa;padding:.5rem;display:block">person</span></div>
+<div><h1 style="font-size:1.1rem;font-weight:700">Namaste, Ramesh! 👋</h1><p style="font-size:.75rem;color:#a8acaa;display:flex;align-items:center;gap:.25rem"><span class="material-symbols-outlined" style="font-size:12px;color:var(--primary);font-variation-settings:'FILL' 1">location_on</span>Khetgaon, Madhya Pradesh</p></div>
+</div>
+<button style="position:relative;padding:.5rem;background:var(--surface-high);border-radius:.75rem;border:1px solid rgba(69,73,71,.3);cursor:pointer;background:none;border:none">
+<span class="material-symbols-outlined" style="font-size:1.5rem;color:#a8acaa">notifications</span>
+<span style="position:absolute;top:2px;right:2px;background:#ef4444;color:white;font-size:9px;width:16px;height:16px;display:flex;align-items:center;justify-content:center;border-radius:50%;font-weight:700">3</span>
+</button>
+</header>
+<!-- Wallet -->
+<section class="px-5 mb-6">
+<div class="obsidian-card p-5" style="background:linear-gradient(135deg,#122416,#0a0f0a)">
+<div class="flex justify-between items-start mb-4">
+<div class="flex gap-4">
+<div style="width:3rem;height:3rem;background:rgba(74,222,128,.2);border-radius:.75rem;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="material-symbols-outlined" style="color:#4ADE80;font-variation-settings:'FILL' 1">wallet</span></div>
+<div><p style="color:#a1a1aa;font-size:.7rem;text-transform:uppercase;letter-spacing:.08em">Wallet Balance</p><div class="flex items-center gap-2"><span style="font-size:1.75rem;font-weight:700" id="homeWalletBal">&#8377;1,245.50</span><span class="material-symbols-outlined" style="font-size:1rem;color:#71717a;cursor:pointer" onclick="toggleBalance()">visibility</span></div></div>
+</div>
+<button onclick="navigate('screen-wallet')" style="background:rgba(123,237,141,.15);border:1px solid rgba(123,237,141,.3);color:#7bed8d;font-size:.75rem;font-weight:600;padding:.4rem .85rem;border-radius:.5rem;cursor:pointer;display:flex;align-items:center;gap:.25rem">
+<span class="material-symbols-outlined" style="font-size:14px">add</span> Add Money
+</button>
+</div>
+<div style="border-top:1px solid rgba(255,255,255,.06);padding-top:.75rem;display:flex;justify-content:space-between;align-items:center;font-size:.75rem">
+<div style="display:flex;align-items:center;gap:.5rem"><span class="material-symbols-outlined" style="font-size:16px;color:#fb923c;font-variation-settings:'FILL' 1">redeem</span><span style="color:#d4d4d8">Rewards Unlocked</span></div>
+<button onclick="navigate('screen-missions')" style="display:flex;align-items:center;gap:.4rem;background:none;border:none;cursor:pointer">
+<span style="color:#7bed8d;font-weight:700">&#8377;125</span><span style="color:#52525b">this month</span><span class="material-symbols-outlined" style="font-size:14px;color:#52525b">chevron_right</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Quick Actions -->
+<section class="px-5 mb-6">
+<h2 style="font-size:1rem;font-weight:600;margin-bottom:.5rem">What would you like to do today?</h2>
+<p style="font-size:.8rem;color:#71717a;margin-bottom:1rem">Scan any product to get started</p>
+<div class="grid grid-cols-2 gap-4">
+<div onclick="navigate('screen-scan-inventory')" class="obsidian-card p-4 flex flex-col items-center text-center cursor-pointer" style="background:linear-gradient(180deg,#162516,#0a0c0a);active:scale-95;transition:transform .15s">
+<div style="position:relative;margin-bottom:1rem;margin-top:.5rem">
+<div style="width:4rem;height:4rem;background:rgba(255,255,255,.06);border-radius:.5rem;display:flex;align-items:center;justify-content:center"><span class="material-symbols-outlined" style="font-size:2.5rem;color:#fde68a;font-variation-settings:'FILL' 1">inventory_2</span></div>
+<div style="position:absolute;bottom:-6px;right:-6px;background:#7bed8d;padding:3px;border-radius:50%;color:#000"><span class="material-symbols-outlined" style="font-size:14px;font-weight:700">add</span></div>
+</div>
+<h3 style="font-weight:700;font-size:.9rem;margin-bottom:.3rem">Add to Inventory</h3>
+<p style="font-size:.65rem;color:#52525b">Scan products to stock up</p>
+</div>
+<div onclick="navigate('screen-scan-sell')" class="obsidian-card p-4 flex flex-col items-center text-center cursor-pointer" style="transition:transform .15s">
+<div style="position:relative;margin-bottom:1rem;margin-top:.5rem">
+<div style="width:4rem;height:4rem;background:rgba(255,255,255,.06);border-radius:.5rem;display:flex;align-items:center;justify-content:center"><span class="material-symbols-outlined" style="font-size:2.5rem;color:#7bed8d;font-variation-settings:'FILL' 1">storefront</span></div>
+<div style="position:absolute;bottom:-6px;right:-6px;background:rgba(255,255,255,.15);padding:3px;border-radius:50%;color:#fff"><span class="material-symbols-outlined" style="font-size:14px">bolt</span></div>
+</div>
+<h3 style="font-weight:700;font-size:.9rem;margin-bottom:.3rem">Sell a Product</h3>
+<p style="font-size:.65rem;color:#52525b">Earn on every verified sale</p>
+</div>
+</div>
+</section>
+<!-- Streak Banner -->
+<section class="px-5 mb-6">
+<div onclick="navigate('screen-streak')" style="background:linear-gradient(135deg,rgba(255,215,0,.08),rgba(0,0,0,0));border:1px solid rgba(255,215,0,.2);border-radius:1rem;padding:1rem;cursor:pointer;display:flex;align-items:center;gap:.75rem">
+<div style="width:2.5rem;height:2.5rem;background:linear-gradient(135deg,#FFD700,#B8860B);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="material-symbols-outlined" style="font-size:1.25rem;color:#003300;font-variation-settings:'FILL' 1">military_tech</span></div>
+<div class="flex-1"><p style="font-size:.7rem;color:rgba(255,215,0,.7);font-weight:600;text-transform:uppercase;letter-spacing:.08em">Gold Tier</p><p style="font-size:.875rem;font-weight:700;text-shadow:0 0 15px rgba(255,215,0,.4)">4-Day Streak Bonus Active!</p></div>
+<span class="material-symbols-outlined" style="color:rgba(255,215,0,.6);font-size:20px">chevron_right</span>
+</div>
+</section>
+<!-- Inventory -->
+<section class="px-5 mb-4">
+<div class="flex justify-between items-center mb-3">
+<h2 style="font-size:1rem;font-weight:600">Your Inventory <span style="color:#52525b;font-weight:400;font-size:.875rem">(12 products)</span></h2>
+<button onclick="navigate('screen-scan-inventory')" style="font-size:.75rem;color:var(--primary);font-weight:600;background:none;border:none;cursor:pointer">View All</button>
+</div>
+<div class="space-y-3">
+<div class="obsidian-card p-4 flex items-center gap-4 cursor-pointer" onclick="navigate('screen-sell-product')" style="transition:transform .15s">
+<div style="width:3rem;height:3rem;background:white;border-radius:.5rem;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0"><img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBalGtMBJMStbd7meHEQsDj966dJtLhlbgCcyzTIYqoG43jCMzbfkiGrbLxNLj8MhZO_rnm_becEI7LEdrnDx5NnmLO85tkTpwcmEUSkSjrrdBKkpsUlsYgQaJGyYtCyFo5sBH16slZEk5mhf0YqNeKJdQQKBdo_pB14IMlOnzRLe78NpmI_D-OxCLnhm5GQJhkHky-uDhA-baiQb3zbnf7WLH2_-y_n5ib9WlS7d_RbmwhJ77-jHvoKCeli6iYdTxbv9B-eOkJZCzG" style="width:90%;height:90%;object-fit:contain" alt="DAP"/></div>
+<div class="flex-1 min-w-0"><p style="font-weight:700;font-size:.9rem" class="truncate">IFFCO DAP 18:46:0</p><p style="font-size:.75rem;color:#a8acaa">50 kg • Fertilizer</p></div>
+<div class="text-right"><p style="font-weight:700;color:var(--primary)">&#8377;1,350</p><p style="font-size:.7rem;color:#71717a">8 in stock</p></div>
+</div>
+<div class="obsidian-card p-4 flex items-center gap-4 cursor-pointer" onclick="navigate('screen-sell-product')">
+<div style="width:3rem;height:3rem;background:var(--surface-highest);border-radius:.5rem;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="material-symbols-outlined" style="font-size:1.75rem;color:var(--secondary);font-variation-settings:'FILL' 1">grass</span></div>
+<div class="flex-1"><p style="font-weight:700;font-size:.9rem">Urea 46% N</p><p style="font-size:.75rem;color:#a8acaa">50 kg • Fertilizer</p></div>
+<div class="text-right"><p style="font-weight:700;color:var(--primary)">&#8377;267</p><p style="font-size:.7rem;color:#71717a">15 in stock</p></div>
+</div>
+<div class="obsidian-card p-4 flex items-center gap-4 cursor-pointer" onclick="navigate('screen-sell-product')">
+<div style="width:3rem;height:3rem;background:var(--surface-highest);border-radius:.5rem;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="material-symbols-outlined" style="font-size:1.75rem;color:var(--tertiary);font-variation-settings:'FILL' 1">water_drop</span></div>
+<div class="flex-1"><p style="font-weight:700;font-size:.9rem">Gromor Amino Acid 40%</p><p style="font-size:.75rem;color:#a8acaa">1L Bottle</p></div>
+<div class="text-right"><p style="font-weight:700;color:var(--primary)">&#8377;320</p><p style="font-size:.7rem;color:#71717a">5 in stock</p></div>
+</div>
+</div>
+</section>
+<!-- Quick Links Grid -->
+<section class="px-5 mb-8">
+<div class="grid grid-cols-4 gap-2">
+<button onclick="navigate('screen-dashboard')" style="display:flex;flex-direction:column;align-items:center;gap:.3rem;padding:.75rem .25rem;background:var(--surface-high);border:1px solid rgba(69,73,71,.2);border-radius:.75rem;cursor:pointer;color:var(--on-surface)"><span class="material-symbols-outlined text-primary" style="font-size:22px">analytics</span><span style="font-size:.6rem;font-weight:600">Dashboard</span></button>
+<button onclick="navigate('screen-transactions')" style="display:flex;flex-direction:column;align-items:center;gap:.3rem;padding:.75rem .25rem;background:var(--surface-high);border:1px solid rgba(69,73,71,.2);border-radius:.75rem;cursor:pointer;color:var(--on-surface)"><span class="material-symbols-outlined text-secondary" style="font-size:22px">receipt_long</span><span style="font-size:.6rem;font-weight:600">History</span></button>
+<button onclick="navigate('screen-missions')" style="display:flex;flex-direction:column;align-items:center;gap:.3rem;padding:.75rem .25rem;background:var(--surface-high);border:1px solid rgba(69,73,71,.2);border-radius:.75rem;cursor:pointer;color:var(--on-surface)"><span class="material-symbols-outlined text-tertiary" style="font-size:22px">emoji_events</span><span style="font-size:.6rem;font-weight:600">Missions</span></button>
+<button onclick="navigate('screen-reward-wheel')" style="display:flex;flex-direction:column;align-items:center;gap:.3rem;padding:.75rem .25rem;background:var(--surface-high);border:1px solid rgba(69,73,71,.2);border-radius:.75rem;cursor:pointer;color:var(--on-surface)"><span class="material-symbols-outlined" style="font-size:22px;color:#FFD700">casino</span><span style="font-size:.6rem;font-weight:600">Spin</span></button>
+</div>
+</section>
+<div class="bottom-nav">
+<button class="nav-btn active" onclick="setNav(this);navigate('screen-home')"><span class="material-symbols-outlined">home</span><span>Home</span></button>
+<button class="nav-btn" onclick="setNav(this);navigate('screen-scan-inventory')"><span class="material-symbols-outlined">qr_code_scanner</span><span>Scan</span></button>
+<button class="nav-btn" onclick="setNav(this);navigate('screen-missions')"><span class="material-symbols-outlined">emoji_events</span><span>Missions</span></button>
+<button class="nav-btn" onclick="setNav(this);navigate('screen-wallet')"><span class="material-symbols-outlined">account_balance_wallet</span><span>Wallet</span></button>
+<button class="nav-btn" onclick="setNav(this);navigate('screen-dashboard')"><span class="material-symbols-outlined">analytics</span><span>More</span></button>
+</div>
+</div>
+
+<!-- SCREEN 12: SCAN INVENTORY -->
+<div class="screen" id="screen-scan-inventory">
+<header class="sticky top-0 z-50 px-5 py-4 flex items-center justify-between" style="background:var(--surface)">
+<div class="flex items-center gap-3">
+<button onclick="goBack()"><span class="material-symbols-outlined text-on-surface-variant">arrow_back</span></button>
+<div><h1 style="font-size:1.05rem;font-weight:700">Add Inventory</h1><p style="font-size:.7rem;color:#a8acaa">Scan to add products instantly</p></div>
+</div>
+<span style="font-size:.75rem;color:#a8acaa">Need help?</span>
+</header>
+<div class="px-5 flex gap-2 mb-4">
+<button class="tab-btn active" id="tabScan" onclick="this.classList.add('active');document.getElementById('tabInv').classList.remove('active');document.getElementById('tabMan').classList.remove('active')">
+<span class="material-symbols-outlined" style="font-size:14px">qr_code_scanner</span>Scan
+</button>
+<button class="tab-btn" id="tabInv" onclick="navigate('screen-upload-invoice')">
+<span class="material-symbols-outlined" style="font-size:14px">upload_file</span>Invoice
+</button>
+<button class="tab-btn" id="tabMan" onclick="navigate('screen-manual-entry')">
+<span class="material-symbols-outlined" style="font-size:14px">edit</span>Manual
+</button>
+</div>
+<div class="px-5 mb-4">
+<div style="position:relative;border-radius:1rem;overflow:hidden;background:#000;aspect-ratio:4/3;border:2px solid var(--surface-high)">
+<img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBGnSWAuVSwvQHCWZWuanm5MrO1RhKhXqKT-1TsG1h6N8iP8ccYRGEoeHRTWb4CFGtb1hwQ20n6xZea0o7JeaJQnyT0YEKKnxRjCI8vJEzsI0lzrZUeqNNMSiTaYdxcxg10E8R3o6H4ccnn54AV5D729v4vRqtzymVUy_9W0HVvRkU_gyAgSPIY-jLaA8WOmxaVrMvVxsESOUkV9pINtWhSVmaUsg8eR64JMWUIjy2Kj9sHCDon0bQIrMlqlwJuhOanH8XVU_YiaGo6" style="width:100%;height:100%;object-fit:cover;opacity:.7" alt="Scanner"/>
+<div class="scanner-corner corner-tl"></div><div class="scanner-corner corner-tr"></div>
+<div class="scanner-corner corner-bl"></div><div class="scanner-corner corner-br"></div>
+<div class="scanner-line"></div>
+<div style="position:absolute;bottom:1rem;left:50%;transform:translateX(-50%);width:90%;background:rgba(27,33,31,.88);backdrop-filter:blur(12px);border:1px solid rgba(145,247,142,.25);border-radius:.75rem;padding:.75rem 1rem">
+<div class="flex justify-between items-center">
+<div>
+<div style="display:flex;align-items:center;gap:.4rem;margin-bottom:.25rem"><span class="material-symbols-outlined text-secondary" style="font-size:14px;font-variation-settings:'FILL' 1">check_circle</span><span style="font-size:10px;font-weight:700;color:var(--secondary);text-transform:uppercase;letter-spacing:.08em">Detected</span></div>
+<p style="font-weight:700;font-size:.9rem">Corteva Delegate 11.7% SC</p>
+<p style="font-size:.7rem;color:#a8acaa">250ml • Pesticide</p>
+</div>
+<div class="text-right"><p style="font-weight:700;color:var(--primary)">&#8377;845</p></div>
+</div>
+</div>
+</div>
+</div>
+<div class="px-5 space-y-3 mb-6">
+<button class="btn-primary" onclick="navigate('screen-add-inventory')"><span class="material-symbols-outlined">add_box</span>Add to Inventory</button>
+<button class="btn-secondary" onclick="showToast('Scanning next product...')"><span class="material-symbols-outlined">refresh</span>Scan Again</button>
+</div>
+<div class="px-5 page-content">
+<p style="font-size:.7rem;color:var(--on-surface-variant);font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.75rem">Recent Scans</p>
+<div class="surface-card p-3 flex items-center gap-3 cursor-pointer" onclick="navigate('screen-add-inventory')" style="margin-bottom:.5rem">
+<span class="material-symbols-outlined" style="font-size:18px;color:#a8acaa">inventory_2</span>
+<div class="flex-1"><p style="font-size:.85rem;font-weight:600">IFFCO DAP 18:46:0</p><p style="font-size:.7rem;color:#a8acaa">Just now</p></div>
+<span class="material-symbols-outlined text-primary" style="font-size:16px;font-variation-settings:'FILL' 1">check_circle</span>
+</div>
+</div>
+<div class="bottom-nav">
+<button class="nav-btn" onclick="setNav(this);navigate('screen-home')"><span class="material-symbols-outlined">home</span><span>Home</span></button>
+<button class="nav-btn active" onclick="setNav(this)"><span class="material-symbols-outlined">qr_code_scanner</span><span>Scan</span></button>
+<button class="nav-btn" onclick="setNav(this);navigate('screen-missions')"><span class="material-symbols-outlined">emoji_events</span><span>Missions</span></button>
+<button class="nav-btn" onclick="setNav(this);navigate('screen-wallet')"><span class="material-symbols-outlined">account_balance_wallet</span><span>Wallet</span></button>
+<button class="nav-btn" onclick="setNav(this);navigate('screen-dashboard')"><span class="material-symbols-outlined">analytics</span><span>More</span></button>
+</div>
+</div>
+
+<!-- SCREEN 13: TRANSACTIONS -->
+<div class="screen" id="screen-transactions">
+<header class="sticky top-0 z-50 px-5 py-4 flex items-center gap-3" style="background:var(--surface)">
+<button onclick="goBack()"><span class="material-symbols-outlined text-on-surface-variant">arrow_back</span></button>
+<div class="flex-1"><h1 class="font-headline font-bold text-xl">Transaction History</h1><p style="font-size:.7rem;color:var(--on-surface-variant)">All earnings &amp; withdrawals</p></div>
+<button onclick="showToast('Filter options')"><span class="material-symbols-outlined text-on-surface-variant">filter_list</span></button>
+</header>
+<div class="px-5 mb-5">
+<div class="glass-card p-4">
+<div class="grid grid-cols-3 gap-3 text-center">
+<div><p style="font-size:.65rem;color:var(--on-surface-variant);font-weight:600;text-transform:uppercase;letter-spacing:.08em">Total Earned</p><p style="font-size:1.2rem;font-weight:700;color:var(--primary)">&#8377;4,200</p></div>
+<div style="border-left:1px solid rgba(69,73,71,.3);border-right:1px solid rgba(69,73,71,.3)"><p style="font-size:.65rem;color:var(--on-surface-variant);font-weight:600;text-transform:uppercase;letter-spacing:.08em">Withdrawn</p><p style="font-size:1.2rem;font-weight:700">&#8377;2,954</p></div>
+<div><p style="font-size:.65rem;color:var(--on-surface-variant);font-weight:600;text-transform:uppercase;letter-spacing:.08em">Balance</p><p style="font-size:1.2rem;font-weight:700;color:var(--secondary)">&#8377;1,245</p></div>
+</div>
+</div>
+</div>
+<div class="px-5 flex gap-2 mb-4 overflow-x-auto pb-1">
+<button onclick="filterTx(this,'all')" class="tab-btn active" style="white-space:nowrap;padding:.4rem .85rem;flex:none">All</button>
+<button onclick="filterTx(this,'sale')" class="tab-btn" style="white-space:nowrap;padding:.4rem .85rem;flex:none">Sales</button>
+<button onclick="filterTx(this,'reward')" class="tab-btn" style="white-space:nowrap;padding:.4rem .85rem;flex:none">Rewards</button>
+<button onclick="filterTx(this,'withdrawal')" class="tab-btn" style="white-space:nowrap;padding:.4rem .85rem;flex:none">Withdrawals</button>
+</div>
+<div class="px-5 page-content" id="txList"></div>
+<div class="bottom-nav">
+<button class="nav-btn" onclick="setNav(this);navigate('screen-home')"><span class="material-symbols-outlined">home</span><span>Home</span></button>
+<button class="nav-btn" onclick="setNav(this);navigate('screen-scan-inventory')"><span class="material-symbols-outlined">qr_code_scanner</span><span>Scan</span></button>
+<button class="nav-btn" onclick="setNav(this);navigate('screen-missions')"><span class="material-symbols-outlined">emoji_events</span><span>Missions</span></button>
+<button class="nav-btn active" onclick="setNav(this)"><span class="material-symbols-outlined">account_balance_wallet</span><span>Wallet</span></button>
+<button class="nav-btn" onclick="setNav(this);navigate('screen-dashboard')"><span class="material-symbols-outlined">analytics</span><span>More</span></button>
+</div>
+</div>
+
+<!-- SCREEN 14: MANUAL ENTRY -->
+<div class="screen" id="screen-manual-entry">
+<header class="sticky top-0 z-50 px-5 py-4 flex items-center justify-between" style="background:var(--surface)">
+<div class="flex items-center gap-3">
+<button onclick="goBack()"><span class="material-symbols-outlined text-on-surface-variant">arrow_back</span></button>
+<div><h1 style="font-size:1.05rem;font-weight:700">Add Inventory</h1><p style="font-size:.7rem;color:#a8acaa">Add products manually</p></div>
+</div>
+<span style="font-size:.75rem;color:#a8acaa">Help?</span>
+</header>
+<div class="px-5 flex gap-2 mb-4">
+<button class="tab-btn" onclick="navigate('screen-scan-inventory')"><span class="material-symbols-outlined" style="font-size:14px">qr_code_scanner</span>Scan</button>
+<button class="tab-btn" onclick="navigate('screen-upload-invoice')"><span class="material-symbols-outlined" style="font-size:14px">upload_file</span>Invoice</button>
+<button class="tab-btn active"><span class="material-symbols-outlined" style="font-size:14px">edit</span>Manual</button>
+</div>
+<main class="px-5 page-content space-y-4">
+<div style="background:rgba(37,99,235,.1);border:1px solid rgba(37,99,235,.3);border-radius:.75rem;padding:.75rem 1rem;display:flex;gap:.75rem;align-items:flex-start">
+<span class="material-symbols-outlined" style="font-size:18px;color:#60a5fa;flex-shrink:0;margin-top:2px;font-variation-settings:'FILL' 1">info</span>
+<p style="font-size:.75rem;color:#93c5fd;line-height:1.5">Manually added products won't earn scan rewards. Use barcode scan to maximize earnings.</p>
+</div>
+<div><label class="input-label">Product Name *</label><input class="input-field" type="text" placeholder="e.g. IFFCO DAP 18:46:0"/></div>
+<div class="grid grid-cols-2 gap-3">
+<div><label class="input-label">Category</label><select class="input-field" style="appearance:none"><option>Fertilizer</option><option>Pesticide</option><option>Seed</option><option>Equipment</option></select></div>
+<div><label class="input-label">Unit</label><select class="input-field" style="appearance:none"><option>kg</option><option>litre</option><option>pack</option><option>piece</option></select></div>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<div><label class="input-label">Quantity</label><input class="input-field" type="number" value="10"/></div>
+<div><label class="input-label">Purchase Price (&#8377;)</label><input class="input-field" type="number" value="1200"/></div>
+</div>
+<div><label class="input-label">Selling Price (&#8377;)</label><input class="input-field" type="number" value="1350"/></div>
+<div class="grid grid-cols-2 gap-3">
+<div><label class="input-label">Mfg. Date</label><input class="input-field" type="month" value="2024-06"/></div>
+<div><label class="input-label">Exp. Date</label><input class="input-field" type="month" value="2027-05"/></div>
+</div>
+<button class="btn-primary" onclick="showToast('Product added! &#10003;');navigate('screen-scan-inventory')"><span class="material-symbols-outlined">add_box</span>Add to Inventory</button>
+</main>
+</div>
+
+<!-- SCREEN 15: DASHBOARD -->
+<div class="screen" id="screen-dashboard">
+<header class="px-5 py-5 flex items-center gap-3">
+<div style="width:3rem;height:3rem;border-radius:50%;background:var(--surface-high);display:flex;align-items:center;justify-content:center"><span class="material-symbols-outlined" style="font-size:1.75rem;color:#a8acaa">person</span></div>
+<div class="flex-1"><h1 style="font-size:1.2rem;font-weight:700">Namaste, Ramesh! 👋</h1><p style="font-size:.75rem;color:#a8acaa">Khetgaon, Madhya Pradesh</p></div>
+<button style="position:relative;padding:.5rem;background:var(--surface-high);border-radius:.75rem;border:1px solid rgba(69,73,71,.3);background:none;border:none;cursor:pointer">
+<span class="material-symbols-outlined" style="font-size:1.4rem;color:#a8acaa">notifications</span>
+<span style="position:absolute;top:2px;right:2px;background:#ef4444;color:white;font-size:9px;width:16px;height:16px;display:flex;align-items:center;justify-content:center;border-radius:50%;font-weight:700">3</span>
+</button>
+</header>
+<main class="px-5 page-content">
+<div class="obsidian-card p-5 mb-5" style="background:linear-gradient(135deg,#122416,#0a0f0a)">
+<div class="flex justify-between items-start mb-3">
+<div class="flex gap-3 items-center">
+<div style="width:3rem;height:3rem;background:rgba(74,222,128,.2);border-radius:.75rem;display:flex;align-items:center;justify-content:center"><span class="material-symbols-outlined" style="color:#4ADE80;font-variation-settings:'FILL' 1">wallet</span></div>
+<div><p style="font-size:.7rem;color:#a1a1aa;text-transform:uppercase;letter-spacing:.08em">Wallet Balance</p><p style="font-size:1.75rem;font-weight:700">&#8377;1,245.50</p></div>
+</div>
+<div><div style="background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.3);padding:.25rem .75rem;border-radius:9999px;margin-bottom:.5rem"><span style="font-size:10px;font-weight:700;color:#FFD700">GOLD TIER</span></div></div>
+</div>
+<div class="grid grid-cols-3 gap-3 border-t pt-3" style="border-color:rgba(255,255,255,.06)">
+<div class="text-center"><p style="font-size:1.1rem;font-weight:700;color:var(--primary)">247</p><p style="font-size:.65rem;color:#71717a">Total Sales</p></div>
+<div class="text-center" style="border-left:1px solid rgba(69,73,71,.2);border-right:1px solid rgba(69,73,71,.2)"><p style="font-size:1.1rem;font-weight:700;color:var(--secondary)">&#8377;4.2K</p><p style="font-size:.65rem;color:#71717a">Total Earned</p></div>
+<div class="text-center"><p style="font-size:1.1rem;font-weight:700;color:#FFD700">4</p><p style="font-size:.65rem;color:#71717a">Day Streak</p></div>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-3 mb-5">
+<button onclick="navigate('screen-scan-inventory')" class="surface-card p-4 text-left cursor-pointer" style="background:linear-gradient(135deg,#162516,#0a0c0a);border:1px solid rgba(74,222,128,.15)"><span class="material-symbols-outlined text-primary mb-2" style="font-size:28px;display:block">barcode_scanner</span><p style="font-weight:700;font-size:.9rem">Add Inventory</p><p style="font-size:.7rem;color:#71717a">Scan products</p></button>
+<button onclick="navigate('screen-scan-sell')" class="surface-card p-4 text-left cursor-pointer"><span class="material-symbols-outlined text-secondary mb-2" style="font-size:28px;display:block">point_of_sale</span><p style="font-weight:700;font-size:.9rem">Sell a Product</p><p style="font-size:.7rem;color:#71717a">Earn on every sale</p></button>
+<button onclick="navigate('screen-missions')" class="surface-card p-4 text-left cursor-pointer"><span class="material-symbols-outlined text-tertiary mb-2" style="font-size:28px;display:block;font-variation-settings:'FILL' 1">flag</span><p style="font-weight:700;font-size:.9rem">Today's Mission</p><p style="font-size:.7rem;color:#71717a">&#8377;65/&#8377;120 target</p></button>
+<button onclick="navigate('screen-transactions')" class="surface-card p-4 text-left cursor-pointer"><span class="material-symbols-outlined mb-2" style="font-size:28px;display:block;color:#fb923c">receipt_long</span><p style="font-weight:700;font-size:.9rem">Transactions</p><p style="font-size:.7rem;color:#71717a">View all history</p></button>
+</div>
+<!-- Bar chart placeholder -->
+<div class="surface-card p-5 mb-5">
+<div class="flex justify-between items-center mb-4"><h2 style="font-weight:700;font-size:.95rem">Weekly Earnings</h2><span style="font-size:.7rem;color:var(--primary);font-weight:600">This Week</span></div>
+<div style="display:flex;align-items:flex-end;gap:.5rem;height:70px">
+<div style="flex:1;background:rgba(145,247,142,.15);border-radius:.25rem .25rem 0 0;height:40%;display:flex;align-items:flex-end;justify-content:center"><span style="font-size:8px;color:#71717a;padding-bottom:3px">M</span></div>
+<div style="flex:1;background:rgba(145,247,142,.25);border-radius:.25rem .25rem 0 0;height:60%;display:flex;align-items:flex-end;justify-content:center"><span style="font-size:8px;color:#71717a;padding-bottom:3px">T</span></div>
+<div style="flex:1;background:rgba(145,247,142,.4);border-radius:.25rem .25rem 0 0;height:80%;display:flex;align-items:flex-end;justify-content:center"><span style="font-size:8px;color:#71717a;padding-bottom:3px">W</span></div>
+<div style="flex:1;background:rgba(145,247,142,.3);border-radius:.25rem .25rem 0 0;height:55%;display:flex;align-items:flex-end;justify-content:center"><span style="font-size:8px;color:#71717a;padding-bottom:3px">T</span></div>
+<div style="flex:1;background:var(--primary);border-radius:.25rem .25rem 0 0;height:100%;display:flex;align-items:flex-end;justify-content:center"><span style="font-size:8px;color:#005e17;padding-bottom:3px;font-weight:700">F</span></div>
+<div style="flex:1;background:rgba(145,247,142,.15);border-radius:.25rem .25rem 0 0;height:20%;display:flex;align-items:flex-end;justify-content:center"><span style="font-size:8px;color:#71717a;padding-bottom:3px">S</span></div>
+<div style="flex:1;background:rgba(145,247,142,.1);border-radius:.25rem .25rem 0 0;height:10%;display:flex;align-items:flex-end;justify-content:center"><span style="font-size:8px;color:#71717a;padding-bottom:3px">S</span></div>
+</div>
+<div style="height:1px;background:rgba(69,73,71,.2);margin:.75rem 0"></div>
+<div class="flex justify-between text-sm"><span style="color:var(--on-surface-variant)">This week total</span><span style="font-weight:700;color:var(--primary)">&#8377;420</span></div>
+</div>
+<div class="grid grid-cols-2 gap-3 mb-5">
+<div onclick="navigate('screen-streak')" class="surface-card p-4 cursor-pointer" style="background:linear-gradient(135deg,rgba(255,215,0,.06),rgba(0,0,0,0));border:1px solid rgba(255,215,0,.15)"><span class="material-symbols-outlined" style="font-size:24px;color:#FFD700;font-variation-settings:'FILL' 1">local_fire_department</span><p style="font-size:1.5rem;font-weight:800;color:#FFD700;margin:.3rem 0;text-shadow:0 0 15px rgba(255,215,0,.4)">4 Days</p><p style="font-size:.7rem;color:#a8acaa">Earning Streak</p></div>
+<div onclick="navigate('screen-reward-wheel')" class="surface-card p-4 cursor-pointer"><span class="material-symbols-outlined" style="font-size:24px;color:#FFD700;font-variation-settings:'FILL' 1">casino</span><p style="font-size:1.5rem;font-weight:800;color:var(--primary);margin:.3rem 0">1 Spin</p><p style="font-size:.7rem;color:#a8acaa">Available Now!</p></div>
+</div>
+</main>
+<div class="bottom-nav">
+<button class="nav-btn" onclick="setNav(this);navigate('screen-home')"><span class="material-symbols-outlined">home</span><span>Home</span></button>
+<button class="nav-btn" onclick="setNav(this);navigate('screen-scan-inventory')"><span class="material-symbols-outlined">qr_code_scanner</span><span>Scan</span></button>
+<button class="nav-btn" onclick="setNav(this);navigate('screen-missions')"><span class="material-symbols-outlined">emoji_events</span><span>Missions</span></button>
+<button class="nav-btn" onclick="setNav(this);navigate('screen-wallet')"><span class="material-symbols-outlined">account_balance_wallet</span><span>Wallet</span></button>
+<button class="nav-btn active" onclick="setNav(this)"><span class="material-symbols-outlined">analytics</span><span>More</span></button>
+</div>
+</div>
+
+<!-- SCREEN 16: SCAN SELL -->
+<div class="screen" id="screen-scan-sell">
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-5 py-4" style="background:var(--surface)">
+<div class="flex items-center gap-3">
+<button onclick="goBack()"><span class="material-symbols-outlined" style="color:var(--primary)">menu</span></button>
+<span class="font-headline font-bold text-lg">Obsidian Ledger</span>
+</div>
+<div style="width:2.5rem;height:2.5rem;border-radius:50%;background:var(--surface-high);display:flex;align-items:center;justify-content:center;overflow:hidden"><span class="material-symbols-outlined" style="font-size:1.5rem;color:#a8acaa">person</span></div>
+</header>
+<main class="mt-20 px-5 page-content space-y-4">
+<div class="surface-card flex items-center justify-between p-4">
+<div class="flex items-center gap-3">
+<div style="width:3rem;height:3rem;background:rgba(145,247,142,.1);border-radius:.5rem;display:flex;align-items:center;justify-content:center"><span class="material-symbols-outlined text-primary" style="font-size:1.75rem;font-variation-settings:'FILL' 1">bolt</span></div>
+<div><h2 class="font-headline font-bold">Scan Product</h2><p style="font-size:.7rem;color:var(--on-surface-variant);text-transform:uppercase;letter-spacing:.06em">Barcode or QR code</p></div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant">search</span>
+</div>
+<div style="position:relative;border-radius:1rem;overflow:hidden;background:#000;aspect-ratio:4/3;border:2px solid var(--surface-high)">
+<img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBGnSWAuVSwvQHCWZWuanm5MrO1RhKhXqKT-1TsG1h6N8iP8ccYRGEoeHRTWb4CFGtb1hwQ20n6xZea0o7JeaJQnyT0YEKKnxRjCI8vJEzsI0lzrZUeqNNMSiTaYdxcxg10E8R3o6H4ccnn54AV5D729v4vRqtzymVUy_9W0HVvRkU_gyAgSPIY-jLaA8WOmxaVrMvVxsESOUkV9pINtWhSVmaUsg8eR64JMWUIjy2Kj9sHCDon0bQIrMlqlwJuhOanH8XVU_YiaGo6" style="width:100%;height:100%;object-fit:cover;opacity:.7" alt="Scanner"/>
+<div class="scanner-corner corner-tl"></div><div class="scanner-corner corner-tr"></div>
+<div class="scanner-corner corner-bl"></div><div class="scanner-corner corner-br"></div>
+<div class="scanner-line"></div>
+<div style="position:absolute;bottom:1rem;left:50%;transform:translateX(-50%);width:90%;background:rgba(27,33,31,.88);backdrop-filter:blur(12px);border:1px solid rgba(145,247,142,.25);border-radius:.75rem;padding:.75rem 1rem">
+<div class="flex justify-between items-center">
+<div><div style="display:flex;align-items:center;gap:.4rem;margin-bottom:.25rem"><span class="material-symbols-outlined text-secondary" style="font-size:14px;font-variation-settings:'FILL' 1">check_circle</span><span style="font-size:10px;font-weight:700;color:var(--secondary);text-transform:uppercase">Added to Cart</span></div>
+<p style="font-weight:700;font-size:.9rem">Gromor Amino Acid 40%</p><p style="font-size:.7rem;color:#a8acaa">1L Bottle</p></div>
+<div class="text-right"><p style="font-weight:700;color:var(--primary)">&#8377;320.00</p></div>
+</div>
+</div>
+</div>
+<div class="surface-card p-4">
+<div class="flex justify-between items-center mb-3">
+<h3 class="font-headline font-semibold" style="color:var(--on-surface-variant)">Cart (2 items)</h3>
+<button onclick="showToast('Cart cleared')" style="font-size:.75rem;font-weight:700;color:#ef4444;background:none;border:none;cursor:pointer">Clear Cart</button>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between items-center text-sm"><span>Gromor Amino Acid 40%</span><span style="font-weight:600">&#8377;320</span></div>
+<div class="flex justify-between items-center text-sm"><span>IFFCO DAP 18:46:0</span><span style="font-weight:600">&#8377;1,350</span></div>
+<div style="border-top:1px solid rgba(69,73,71,.2);margin-top:.5rem;padding-top:.5rem" class="flex justify-between"><span style="font-weight:700">Total</span><span style="font-weight:700;color:var(--primary)">&#8377;1,670</span></div>
+</div>
+</div>
+<div style="background:rgba(145,247,142,.06);border:1px solid rgba(145,247,142,.15);border-radius:.75rem;padding:.75rem 1rem;display:flex;align-items:center;gap:.75rem">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings:'FILL' 1">redeem</span>
+<div><p style="font-size:.8rem;font-weight:700">Earn <span style="color:var(--primary)">&#8377;17</span> on this sale</p><p style="font-size:.7rem;color:var(--on-surface-variant)">Confirm with OTP for +&#8377;5 bonus</p></div>
+</div>
+<button class="btn-primary" onclick="navigate('screen-checkout')"><span class="material-symbols-outlined">shopping_cart_checkout</span>Proceed to Checkout</button>
+</main>
+</div>
+
+<!-- SCREEN 17: CHECKOUT -->
+<div class="screen" id="screen-checkout">
+<header class="fixed top-0 w-full z-50 px-5 h-20 flex items-center justify-between" style="background:var(--surface)">
+<div class="flex items-center gap-3">
+<button onclick="navigate('screen-scan-sell',true)" style="width:2.5rem;height:2.5rem;display:flex;align-items:center;justify-content:center;border-radius:50%;background:var(--surface-high);border:none;cursor:pointer"><span class="material-symbols-outlined">arrow_back</span></button>
+<div><h1 class="font-headline font-bold text-xl">Checkout</h1><p style="font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--on-surface-variant);font-weight:600">Confirm sale &amp; verify with farmer</p></div>
+</div>
+<button style="display:flex;align-items:center;gap:.4rem;padding:.35rem .75rem;border-radius:9999px;background:var(--surface-high);border:1px solid rgba(69,73,71,.2);cursor:pointer">
+<span class="material-symbols-outlined text-primary" style="font-size:16px">help_outline</span><span style="font-size:.75rem;font-weight:600">Need help?</span>
+</button>
+</header>
+<main class="mt-24 px-5 page-content space-y-5">
+<div style="background:linear-gradient(135deg,rgba(145,247,142,.12),rgba(82,181,85,.06));border:1px solid rgba(145,247,142,.2);border-radius:1rem;padding:1rem">
+<div class="flex items-start gap-3">
+<div style="width:3rem;height:3rem;background:var(--primary);border-radius:.75rem;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="material-symbols-outlined text-on-primary" style="font-size:1.5rem;font-variation-settings:'FILL' 1">chat</span></div>
+<div><h3 class="font-headline font-bold">Verify with Farmer on WhatsApp</h3><p style="font-size:.8rem;color:var(--primary);font-weight:500;margin-top:.25rem">Get extra &#8377;5 reward after OTP confirmation</p></div>
+</div>
+</div>
+<div>
+<div class="flex items-center justify-between mb-3"><h2 style="font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--on-surface-variant)">Farmer Details</h2></div>
+<div class="space-y-3">
+<div><label class="input-label">Farmer Name</label><input class="input-field" type="text" value="Ramesh Yadav" readonly/></div>
+<div><label class="input-label">WhatsApp Number *</label>
+<div class="flex gap-2"><div style="width:4rem;background:var(--surface-highest);border:1px solid rgba(69,73,71,.3);border-radius:.75rem;display:flex;align-items:center;justify-content:center;padding:.9rem .75rem;font-weight:600;flex-shrink:0;font-size:.9rem">+91</div>
+<input class="input-field flex-1" type="tel" placeholder="Farmer mobile" value="9876543210"/></div></div>
+<div><label class="input-label">Village / Location</label><input class="input-field" type="text" value="Khetgaon, MP"/></div>
+</div>
+</div>
+<div>
+<div class="flex justify-between items-center mb-3"><h2 style="font-size:.85rem;font-weight:700">Cart Summary (2 items)</h2><button onclick="navigate('screen-scan-sell',true)" style="font-size:.75rem;font-weight:700;color:var(--primary);background:none;border:none;cursor:pointer">Edit Cart</button></div>
+<div class="surface-card p-4 space-y-2">
+<div class="flex justify-between text-sm"><span>Gromor Amino Acid 40% x1</span><span style="font-weight:600">&#8377;320</span></div>
+<div class="flex justify-between text-sm"><span>IFFCO DAP 18:46:0 x1</span><span style="font-weight:600">&#8377;1,350</span></div>
+<div style="border-top:1px solid rgba(69,73,71,.2);padding-top:.5rem" class="flex justify-between"><span style="font-weight:700;font-size:1rem">Total</span><span style="font-weight:700;color:var(--primary);font-size:1rem">&#8377;1,670</span></div>
+</div>
+</div>
+<div class="surface-card p-4">
+<h2 style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--on-surface-variant);margin-bottom:.75rem">Your Reward Breakdown</h2>
+<div class="space-y-2">
+<div class="flex justify-between text-sm"><span>Sale reward (1%)</span><span style="color:var(--primary);font-weight:600">+ &#8377;16.70</span></div>
+<div class="flex justify-between text-sm"><span>OTP verification bonus</span><span style="color:var(--primary);font-weight:600">+ &#8377;5.00</span></div>
+<div class="flex justify-between text-sm"><span>Streak bonus (4 days)</span><span style="color:#FFD700;font-weight:600">+ &#8377;4.00</span></div>
+<div style="border-top:1px solid rgba(69,73,71,.2);padding-top:.5rem" class="flex justify-between"><span style="font-weight:700">Total Reward</span><span style="font-weight:700;font-size:1.1rem;color:var(--primary)">&#8377;25.70</span></div>
+</div>
+</div>
+<button class="btn-primary" onclick="navigate('screen-confirm-earn')"><span class="material-symbols-outlined">send</span>Send OTP to Farmer</button>
+</main>
+</div>
+
+<!-- SCREEN 18: CONFIRM & EARN -->
+<div class="screen" id="screen-confirm-earn">
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-5 h-16" style="background:#101413">
+<div class="flex items-center gap-3">
+<button onclick="navigate('screen-checkout',true)"><span class="material-symbols-outlined text-primary">arrow_back</span></button>
+<div><h1 class="font-headline font-semibold">Confirm &amp; Earn</h1><p style="font-size:10px;color:var(--on-surface-variant);text-transform:uppercase;letter-spacing:.1em;font-weight:600">Enter OTP to complete sale</p></div>
+</div>
+<span class="material-symbols-outlined text-primary">help</span>
+</header>
+<main class="mt-20 px-5 page-content space-y-5">
+<div style="position:relative;border-radius:1rem;overflow:hidden;box-shadow:0 20px 40px rgba(0,0,0,.4)">
+<img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDdXcld_NtxNZ3C6NH2GgsjuGqVI5KXz6o_MTCyG6lwN4Q-pZ47CdzwO-fv5I8IaXT5BDuaX0qZAggfvOC339aegA2SHaEF5SBi9UXNGzrgwX-aBypt92tE9p07jmJfhvNVG4t_4JeQT3KqEQ_DFWpnZkyCPt19KHKxGL6Ata7n_xtbetdOWPNiCPT7CD3IK36S0psGwWIZ36QLSXn0MF2JuvKjE44jFcxmtmOSDQTAZV2TA89qOyPCedmiGYLX8yOqEID5z1G9bvqL" style="width:100%;height:11rem;object-fit:cover" alt="Farmer sale"/>
+<div style="position:absolute;inset:0;background:linear-gradient(to top,var(--surface),transparent)"></div>
+<div style="position:absolute;bottom:1rem;left:1rem;display:flex;gap:.5rem">
+<div style="width:3rem;height:4px;background:var(--primary);border-radius:9999px"></div>
+<div style="width:3rem;height:4px;background:var(--primary);border-radius:9999px"></div>
+<div style="width:3rem;height:4px;background:var(--surface-highest);border-radius:9999px"></div>
+</div>
+</div>
+<div class="surface-card p-5 space-y-4">
+<div class="flex justify-between items-end">
+<div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--primary)">Step 2 of 3</p><h2 class="font-headline text-xl font-bold mt-1">Enter OTP</h2></div>
+<div class="text-right"><p style="font-size:.75rem;color:var(--on-surface-variant)">Resend in</p><p style="font-size:.9rem;font-weight:700;color:var(--primary)" id="otpTimer">00:45</p></div>
+</div>
+<div class="flex justify-between gap-2">
+<input class="otp-input" maxlength="1" type="text" inputmode="numeric" id="sotp1" oninput="saleOtpNext(this,'sotp2')"/>
+<input class="otp-input" maxlength="1" type="text" inputmode="numeric" id="sotp2" oninput="saleOtpNext(this,'sotp3')"/>
+<input class="otp-input" maxlength="1" type="text" inputmode="numeric" id="sotp3" oninput="saleOtpNext(this,'sotp4')"/>
+<input class="otp-input" maxlength="1" type="text" inputmode="numeric" id="sotp4" oninput="saleOtpNext(this,'sotp5')"/>
+<input class="otp-input" maxlength="1" type="text" inputmode="numeric" id="sotp5" oninput="saleOtpNext(this,'sotp6')"/>
+<input class="otp-input" maxlength="1" type="text" inputmode="numeric" id="sotp6" oninput="saleOtpNext(this,null)"/>
+</div>
+<p style="font-size:.75rem;color:var(--on-surface-variant)">Demo OTP: <strong style="color:var(--primary)">673421</strong></p>
+<button class="btn-primary" onclick="completeSale()">Verify &amp; Complete Sale</button>
+</div>
+<div class="surface-card p-4">
+<h3 style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--on-surface-variant);margin-bottom:.75rem;display:flex;align-items:center;gap:.4rem"><span class="material-symbols-outlined text-secondary" style="font-size:16px">info</span>What the farmer will receive</h3>
+<div class="space-y-2 text-sm">
+<div class="flex justify-between"><span style="color:var(--on-surface-variant)">WhatsApp receipt</span><span class="material-symbols-outlined" style="font-size:16px;color:var(--secondary);font-variation-settings:'FILL' 1">check</span></div>
+<div class="flex justify-between"><span style="color:var(--on-surface-variant)">Digital purchase proof</span><span class="material-symbols-outlined" style="font-size:16px;color:var(--secondary);font-variation-settings:'FILL' 1">check</span></div>
+<div class="flex justify-between"><span style="color:var(--on-surface-variant)">Product authenticity cert</span><span class="material-symbols-outlined" style="font-size:16px;color:var(--secondary);font-variation-settings:'FILL' 1">check</span></div>
+</div>
+</div>
+<button class="btn-secondary" onclick="showToast('WhatsApp OTP sent to farmer!')"><span class="material-symbols-outlined" style="color:#25D366">chat</span>Resend OTP via WhatsApp</button>
+</main>
+</div>
+
+<!-- SCREEN 19: WALLET -->
+<div class="screen" id="screen-wallet">
+<header class="sticky top-0 z-50 px-5 py-4 flex items-center justify-between" style="background:var(--surface)">
+<button onclick="navigate('screen-home',true)"><span class="material-symbols-outlined text-on-surface-variant">arrow_back</span></button>
+<h2 class="font-headline font-bold text-xl">My Wallet</h2>
+<button onclick="navigate('screen-transactions')"><span class="material-symbols-outlined text-on-surface-variant">receipt_long</span></button>
+</header>
+<main class="px-5 page-content">
+<div class="obsidian-card p-5 mb-6" style="background:linear-gradient(135deg,#1a1a1a,#0d0d0d);border:1px solid rgba(217,179,106,.15)">
+<div class="flex justify-between items-start mb-4">
+<div><p style="font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--on-surface-variant)">Total Balance</p>
+<div class="flex items-center gap-2 mt-1">
+<span style="font-size:2.5rem;font-weight:700" id="walletBalance">&#8377;1,245.50</span>
+<button onclick="toggleBalance()" style="background:none;border:none;cursor:pointer"><span class="material-symbols-outlined" style="font-size:20px;color:var(--on-surface-variant)">visibility</span></button>
+</div></div>
+<div><div style="background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.25);padding:.25rem .75rem;border-radius:9999px;margin-bottom:.5rem"><span style="font-size:10px;font-weight:700;color:#FFD700">GOLD TIER</span></div><p style="font-size:.7rem;color:var(--on-surface-variant);text-align:right">247 sales</p></div>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<button onclick="navigate('screen-transactions')" class="btn-secondary" style="padding:.6rem"><span class="material-symbols-outlined" style="font-size:16px">receipt_long</span>History</button>
+<button onclick="showToast('Add money coming soon!')" class="btn-secondary" style="padding:.6rem"><span class="material-symbols-outlined" style="font-size:16px">add_card</span>Add Money</button>
+</div>
+</div>
+<div class="mb-6">
+<h3 class="font-headline font-bold mb-4">Transfer to Bank</h3>
+<div class="grid grid-cols-2 gap-2 mb-3">
+<button class="amount-btn" onclick="selectAmt(this,'1000')">&#8377;1,000</button>
+<button class="amount-btn selected" onclick="selectAmt(this,'2500')">&#8377;2,500</button>
+<button class="amount-btn" onclick="selectAmt(this,'5000')">&#8377;5,000</button>
+<button class="amount-btn" onclick="selectAmt(this,'10000')">&#8377;10,000</button>
+</div>
+<div style="margin-bottom:1rem"><label class="input-label">Or enter custom amount</label>
+<div class="relative"><span style="position:absolute;left:.85rem;top:50%;transform:translateY(-50%);font-weight:700;color:var(--on-surface-variant)">&#8377;</span>
+<input class="input-field" type="number" placeholder="0.00" style="padding-left:1.75rem"/></div></div>
+<div class="surface-card p-4 mb-4 flex items-center gap-3">
+<span class="material-symbols-outlined text-on-surface-variant" style="font-size:20px">account_balance</span>
+<div><p style="font-size:.875rem;font-weight:600">SBI — XXXX 4512</p><p style="font-size:.7rem;color:var(--on-surface-variant)">Primary account</p></div>
+<span class="material-symbols-outlined text-primary" style="margin-left:auto;font-size:18px;font-variation-settings:'FILL' 1">check_circle</span>
+</div>
+<button class="btn-primary" onclick="showToast('&#8377;2,500 transfer initiated to SBI &#10003;')" style="background:linear-gradient(90deg,#d9b36a,#c19b5a);color:#003300">
+<span class="material-symbols-outlined">send_money</span>Transfer &#8377;2,500
+</button>
+</div>
+<div class="surface-card p-5 mb-5">
+<div class="flex justify-between items-center mb-3">
+<h3 class="font-headline font-bold">Rewards Earned</h3>
+<button onclick="navigate('screen-missions')" style="font-size:.75rem;color:var(--primary);font-weight:600;background:none;border:none;cursor:pointer">View All</button>
+</div>
+<div class="space-y-3">
+<div class="flex items-center gap-3">
+<div style="width:2.5rem;height:2.5rem;background:rgba(145,247,142,.1);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="material-symbols-outlined text-primary" style="font-size:16px;font-variation-settings:'FILL' 1">shopping_cart</span></div>
+<div class="flex-1"><p style="font-size:.85rem;font-weight:600">Sale Reward</p><p style="font-size:.7rem;color:var(--on-surface-variant)">IFFCO DAP x2 • Today</p></div>
+<span style="font-weight:700;color:var(--primary)">+&#8377;27</span>
+</div>
+<div class="flex items-center gap-3">
+<div style="width:2.5rem;height:2.5rem;background:rgba(255,215,0,.1);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="material-symbols-outlined" style="font-size:16px;color:#FFD700;font-variation-settings:'FILL' 1">casino</span></div>
+<div class="flex-1"><p style="font-size:.85rem;font-weight:600">Wheel Spin Bonus</p><p style="font-size:.7rem;color:var(--on-surface-variant)">Yesterday</p></div>
+<span style="font-weight:700;color:#FFD700">+&#8377;25</span>
+</div>
+</div>
+</div>
+</main>
+<div class="bottom-nav">
+<button class="nav-btn" onclick="setNav(this);navigate('screen-home')"><span class="material-symbols-outlined">home</span><span>Home</span></button>
+<button class="nav-btn" onclick="setNav(this);navigate('screen-scan-inventory')"><span class="material-symbols-outlined">qr_code_scanner</span><span>Scan</span></button>
+<button class="nav-btn" onclick="setNav(this);navigate('screen-missions')"><span class="material-symbols-outlined">emoji_events</span><span>Missions</span></button>
+<button class="nav-btn active" onclick="setNav(this)"><span class="material-symbols-outlined">account_balance_wallet</span><span>Wallet</span></button>
+<button class="nav-btn" onclick="setNav(this);navigate('screen-dashboard')"><span class="material-symbols-outlined">analytics</span><span>More</span></button>
+</div>
+</div>
+
+<!-- SCREEN 20: ADD TO INVENTORY -->
+<div class="screen" id="screen-add-inventory">
+<header class="sticky top-0 z-50 flex items-center justify-between px-5 py-4" style="background:var(--surface)">
+<div class="flex items-center gap-3">
+<button onclick="navigate('screen-scan-inventory',true)"><span class="material-symbols-outlined text-primary">arrow_back</span></button>
+<div><h1 class="font-headline font-semibold">Add to Inventory</h1><p style="font-size:.7rem;color:var(--on-surface-variant)">Save this product to your stock</p></div>
+</div>
+<span style="font-size:.8rem;font-weight:600;color:var(--primary)">Need help?</span>
+</header>
+<main class="px-5 page-content">
+<div style="background:rgba(134,250,172,.07);border:1px solid rgba(134,250,172,.15);border-radius:.75rem;padding:.75rem 1rem;margin-bottom:1.25rem;display:flex;align-items:center;justify-content:space-between">
+<div class="flex items-center gap-3">
+<div style="width:2.5rem;height:2.5rem;background:rgba(134,250,172,.15);border-radius:50%;display:flex;align-items:center;justify-content:center"><span class="material-symbols-outlined text-primary" style="font-size:16px;font-variation-settings:'FILL' 1">verified</span></div>
+<div><p style="font-weight:600;color:var(--primary);font-size:.875rem">Product Verified</p><p style="font-size:.7rem;color:var(--on-surface-variant)">Genuine product</p></div>
+</div>
+<div style="background:var(--surface-high);padding:.2rem .6rem;border-radius:9999px;border:1px solid rgba(69,73,71,.2)"><span style="font-size:10px;font-weight:700;color:var(--primary);letter-spacing:.08em">CounterOS</span></div>
+</div>
+<div class="surface-card overflow-hidden mb-5">
+<div class="flex">
+<div style="width:35%;background:#fff;position:relative">
+<img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBalGtMBJMStbd7meHEQsDj966dJtLhlbgCcyzTIYqoG43jCMzbfkiGrbLxNLj8MhZO_rnm_becEI7LEdrnDx5NnmLO85tkTpwcmEUSkSjrrdBKkpsUlsYgQaJGyYtCyFo5sBH16slZEk5mhf0YqNeKJdQQKBdo_pB14IMlOnzRLe78NpmI_D-OxCLnhm5GQJhkHky-uDhA-baiQb3zbnf7WLH2_-y_n5ib9WlS7d_RbmwhJ77-jHvoKCeli6iYdTxbv9B-eOkJZCzG" style="width:100%;height:100%;object-fit:contain;padding:.5rem" alt="DAP"/>
+</div>
+<div class="p-4 flex-1 flex flex-col justify-center">
+<div class="flex items-center gap-2 mb-1"><h2 style="font-size:1.1rem;font-weight:700">IFFCO DAP 18:46:0</h2><span class="material-symbols-outlined text-primary" style="font-size:18px;font-variation-settings:'FILL' 1">verified</span></div>
+<p style="font-size:.8rem;color:var(--on-surface-variant);margin-bottom:.75rem">50 kg • Fertilizer</p>
+<div style="background:var(--surface-highest);padding:.2rem .5rem;border-radius:.25rem;font-size:10px;font-weight:600;color:var(--on-surface-variant);font-family:monospace;display:inline-block;border:1px solid rgba(69,73,71,.2)">SKU: IFFCO-DAP-50KG</div>
+</div>
+</div>
+<div class="grid grid-cols-3 gap-3 p-4 border-t" style="border-color:rgba(69,73,71,.15)">
+<div><p style="font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--on-surface-variant)">Batch No.</p><p style="font-size:.8rem;font-weight:600">D240624001</p></div>
+<div><p style="font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--on-surface-variant)">Mfg. Date</p><p style="font-size:.8rem;font-weight:600">Jun 2024</p></div>
+<div><p style="font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--on-surface-variant)">Exp. Date</p><p style="font-size:.8rem;font-weight:600">May 2027</p></div>
+</div>
+</div>
+<div class="surface-card p-4 mb-5">
+<h3 style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--on-surface-variant);margin-bottom:.75rem">Pricing</h3>
+<div class="grid grid-cols-2 gap-3">
+<div><label class="input-label">Purchase Price</label><input class="input-field" type="number" value="1200"/></div>
+<div><label class="input-label">Selling Price</label><input class="input-field" type="number" value="1350"/></div>
+</div>
+</div>
+<div class="surface-card p-4 mb-5">
+<div class="flex items-center justify-between">
+<div><h3 style="font-weight:700">Quantity to Add</h3><p style="font-size:.75rem;color:var(--on-surface-variant)">Units to stock</p></div>
+<div class="flex items-center gap-3">
+<button class="qty-btn" onclick="adjustQty(-1)">&#8722;</button>
+<span style="font-size:1.5rem;font-weight:700;min-width:2.5rem;text-align:center" id="invQty">10</span>
+<button class="qty-btn" onclick="adjustQty(1)">+</button>
+</div>
+</div>
+</div>
+<div style="background:rgba(145,247,142,.06);border:1px solid rgba(145,247,142,.15);border-radius:.75rem;padding:.75rem 1rem;margin-bottom:1.25rem;display:flex;align-items:center;gap:.75rem">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings:'FILL' 1">redeem</span>
+<div><p style="font-size:.8rem;font-weight:700">Earn <span style="color:var(--primary)">&#8377;5</span> for scanning this product</p><p style="font-size:.7rem;color:var(--on-surface-variant)">Scan bonus credited instantly</p></div>
+</div>
+<button class="btn-primary" onclick="addDone()"><span class="material-symbols-outlined">add_box</span>Add <span id="addQtyLabel">10</span> Units to Inventory</button>
+</main>
+</div>
+
+<!-- SCREEN 21: SELL PRODUCT -->
+<div class="screen" id="screen-sell-product">
+<header class="pt-8 px-5 flex items-center justify-between mb-2">
+<div class="flex items-center gap-3">
+<button onclick="goBack()"><span class="material-symbols-outlined">arrow_back</span></button>
+<div><h1 class="font-headline font-bold text-xl">Sell This Product</h1><p style="font-size:.75rem;color:var(--on-surface-variant)">Add to cart and sell to your customer</p></div>
+</div>
+<span style="font-size:.75rem;color:var(--on-surface-variant)">Need help?</span>
+</header>
+<main class="px-5 page-content space-y-4">
+<div style="background:#111;border:1px solid rgba(255,255,255,.05);border-radius:1rem;overflow:hidden">
+<div class="flex gap-4 p-4">
+<div style="width:5rem;height:6rem;background:#1a1a1a;border-radius:.75rem;display:flex;align-items:center;justify-content:center;padding:.5rem;flex-shrink:0">
+<img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCPkk3XAWWNrbFZrULlFgN2-2bJCMGE8U14jo-cf6gCIRW2yeXnNIf1l4nGPcfcaLLGvrQ3NYfUBZWPpTVn0Ow7RV9HGd8J27TB529wDQviPjgFOUZ1rRImHoMWf02rNMV8m8FsquCSL-aPaBVIdQpxeEmzaF-Ul1aZ3pDnViTs7KFK8W0Er3spxqVG2-swv6dryW69Xn5wJ6wGkVrM9uMI7X97Zsaa2T5CCpNzLfr2Z2WFV5RiC3n_l8bDqvom7dUkuxL494cObm4T" style="width:100%;height:100%;object-fit:contain" alt="DAP"/>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start">
+<div><h3 class="font-headline font-bold text-lg leading-tight">IFFCO DAP 18:46:0</h3><p style="font-size:.8rem;color:var(--on-surface-variant)">50 kg • Fertilizer</p></div>
+<div style="display:flex;align-items:center;gap:.25rem;background:rgba(30,42,30,1);border:1px solid rgba(45,74,45,1);color:var(--primary);padding:.15rem .5rem;border-radius:9999px;font-size:10px;font-weight:700;flex-shrink:0"><span class="material-symbols-outlined" style="font-size:12px;font-variation-settings:'FILL' 1">check_circle</span>Verified</div>
+</div>
+<p style="font-size:10px;color:var(--on-surface-variant);font-family:monospace;margin-top:.5rem;text-transform:uppercase">SKU: IFFCO-DAP-50KG</p>
+<div class="grid grid-cols-3 gap-2 mt-3 pt-3 border-t" style="border-color:rgba(255,255,255,.05)">
+<div><p style="font-size:9px;color:var(--on-surface-variant);text-transform:uppercase">Batch</p><p style="font-size:11px;font-weight:600">D240624</p></div>
+<div><p style="font-size:9px;color:var(--on-surface-variant);text-transform:uppercase">Mfg.</p><p style="font-size:11px;font-weight:600">Jun 2024</p></div>
+<div><p style="font-size:9px;color:var(--on-surface-variant);text-transform:uppercase">Exp.</p><p style="font-size:11px;font-weight:600">May 2027</p></div>
+</div>
+</div>
+</div>
+</div>
+<div style="background:#111;border:1px solid rgba(255,255,255,.05);border-radius:1rem;padding:1rem">
+<div class="flex justify-between items-center mb-4">
+<div><p style="font-size:10px;color:var(--on-surface-variant);text-transform:uppercase;letter-spacing:.08em">Selling Price</p><p style="font-size:1.75rem;font-weight:700;color:var(--primary)">&#8377;1,350</p></div>
+<div class="text-right"><p style="font-size:10px;color:var(--on-surface-variant);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.4rem">Quantity</p>
+<div class="flex items-center gap-3">
+<button class="qty-btn" onclick="adjustSellQty(-1)">&#8722;</button>
+<span style="font-size:1.25rem;font-weight:700;min-width:2rem;text-align:center" id="sellQty">1</span>
+<button class="qty-btn" onclick="adjustSellQty(1)">+</button>
+</div></div>
+</div>
+<div style="border-top:1px solid rgba(255,255,255,.05);padding-top:.75rem" class="flex justify-between">
+<span style="color:var(--on-surface-variant)">Total Amount</span>
+<span style="font-size:1.25rem;font-weight:700" id="sellTotal">&#8377;1,350</span>
+</div>
+</div>
+<div style="background:rgba(145,247,142,.06);border:1px solid rgba(145,247,142,.15);border-radius:.75rem;padding:.75rem 1rem;display:flex;align-items:center;gap:.75rem">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings:'FILL' 1">redeem</span>
+<div><p style="font-size:.8rem;font-weight:700">Earn <span style="color:var(--primary)" id="sellReward">&#8377;13.50</span> on this sale</p><p style="font-size:.7rem;color:var(--on-surface-variant)">Confirm with OTP for +&#8377;5 bonus</p></div>
+</div>
+<div style="background:rgba(37,99,235,.08);border:1px solid rgba(37,99,235,.2);border-radius:.75rem;padding:.75rem 1rem;display:flex;gap:.75rem;align-items:center">
+<span class="material-symbols-outlined" style="font-size:18px;color:#60a5fa;font-variation-settings:'FILL' 1">info</span>
+<p style="font-size:.8rem;color:#93c5fd"><strong>8 bags</strong> in stock at Ramesh Agro Store</p>
+</div>
+<button class="btn-primary" onclick="navigate('screen-checkout')"><span class="material-symbols-outlined">shopping_cart</span>Add to Cart &amp; Proceed</button>
+</main>
+</div>
+
+<!-- SCREEN 22: MISSIONS -->
+<div class="screen" id="screen-missions">
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-5 h-16" style="background:var(--surface)">
+<div class="flex items-center gap-2">
+<div style="width:2rem;height:2rem;border-radius:50%;background:var(--surface-high);display:flex;align-items:center;justify-content:center"><span class="material-symbols-outlined text-primary" style="font-size:16px">person</span></div>
+<span class="font-headline font-bold tracking-widest" style="color:var(--primary)">OBSIDIAN LEDGER</span>
+</div>
+<button onclick="navigate('screen-wallet')"><span class="material-symbols-outlined text-primary">account_balance_wallet</span></button>
+</header>
+<main class="pt-20 px-5 page-content">
+<section class="mb-6">
+<span style="font-size:10px;color:var(--primary);font-weight:700;text-transform:uppercase;letter-spacing:.1em">Active Mission</span>
+<h1 class="font-headline text-3xl font-bold mb-2 leading-tight">Today's Earnings Mission</h1>
+<div class="flex items-end gap-2 mb-4"><span class="font-headline font-bold" style="font-size:2.5rem">&#8377;65</span><span style="color:var(--on-surface-variant);font-weight:500;padding-bottom:.4rem">Earned / &#8377;120 Target</span></div>
+<div class="surface-card p-4">
+<div class="flex justify-between items-center mb-3">
+<div class="flex items-center gap-2"><span class="material-symbols-outlined text-tertiary" style="font-size:16px">schedule</span><span style="font-size:.875rem;font-weight:600;color:var(--tertiary)">6h 42m left</span></div>
+<span style="font-size:.875rem;font-weight:700;color:var(--primary)">54% Completed</span>
+</div>
+<div class="progress-bar"><div class="progress-fill" style="width:54%"></div></div>
+</div>
+</section>
+<section class="mb-8">
+<div class="flex justify-between items-center mb-3"><h2 style="font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--on-surface-variant)">Daily Challenges</h2><span style="font-size:.75rem;color:var(--outline)">Refreshes in 17h</span></div>
+<div class="space-y-3">
+<div class="surface-card p-4 flex items-center justify-between" style="border:1px solid rgba(69,73,71,.1)">
+<div class="flex items-center gap-3"><div style="width:2.5rem;height:2.5rem;background:var(--surface-highest);border-radius:.5rem;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="material-symbols-outlined text-on-surface-variant">barcode_scanner</span></div>
+<div><p style="font-size:.875rem;font-weight:600">Scan 3 Products</p><p style="font-size:10px;color:var(--outline)">0 / 3 Completed</p></div></div>
+<div class="text-right"><p style="font-weight:700;color:var(--primary)">&#8377;10</p><p style="font-size:10px;font-weight:700;color:rgba(145,247,142,.5);text-transform:uppercase">Reward</p></div>
+</div>
+<div class="surface-card p-4 flex items-center justify-between" style="border:1px solid rgba(145,247,142,.2);background:rgba(145,247,142,.04)">
+<div class="flex items-center gap-3"><div style="width:2.5rem;height:2.5rem;background:rgba(145,247,142,.15);border-radius:.5rem;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="material-symbols-outlined text-primary" style="font-variation-settings:'FILL' 1">verified</span></div>
+<div><p style="font-size:.875rem;font-weight:600">Complete 2 Verified Sales</p><p style="font-size:10px;color:var(--primary)">1 / 2 Completed</p></div></div>
+<div class="text-right"><p style="font-weight:700;color:var(--primary)">&#8377;30</p><p style="font-size:10px;font-weight:700;color:rgba(145,247,142,.5);text-transform:uppercase">Reward</p></div>
+</div>
+<div class="surface-card p-4 flex items-center justify-between" style="border:1px solid rgba(69,73,71,.1)">
+<div class="flex items-center gap-3"><div style="width:2.5rem;height:2.5rem;background:var(--surface-highest);border-radius:.5rem;display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="material-symbols-outlined text-on-surface-variant">new_label</span></div>
+<div><p style="font-size:.875rem;font-weight:600">Sell 1 New SKU</p><p style="font-size:10px;color:var(--outline)">0 / 1 Completed</p></div></div>
+<div class="text-right"><p style="font-weight:700;color:var(--primary)">&#8377;25</p><p style="font-size:10px;font-weight:700;color:rgba(145,247,142,.5);text-transform:uppercase">Reward</p></div>
+</div>
+</div>
+</section>
+<div style="background:linear-gradient(135deg,rgba(255,215,0,.08),rgba(0,0,0,0));border:1px solid rgba(255,215,0,.2);border-radius:1rem;padding:1.25rem;margin-bottom:1.5rem;text-align:center">
+<p style="font-size:10px;font-weight:700;color:rgba(255,215,0,.7);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.4rem">Jackpot Unlocked</p>
+<h2 class="font-headline font-bold text-xl mb-2">&#8377;30 Jackpot Spin Unlocked</h2>
+<p style="font-size:.8rem;color:var(--on-surface-variant);margin-bottom:1rem">Complete 2 verified sales to claim</p>
+<button class="btn-gold" onclick="navigate('screen-reward-wheel')"><span class="material-symbols-outlined">casino</span>Spin the Wheel</button>
+</div>
+<div onclick="navigate('screen-streak')" style="background:rgba(145,247,142,.06);border:1px solid rgba(145,247,142,.15);border-radius:1rem;padding:1rem;cursor:pointer;display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+<div class="flex items-center gap-3"><span class="material-symbols-outlined" style="font-size:28px;color:var(--primary);font-variation-settings:'FILL' 1">local_fire_department</span><div><p style="font-weight:700">4 Day Streak!</p><p style="font-size:.75rem;color:var(--on-surface-variant)">Earn &#8377;10 bonus today</p></div></div>
+<span class="material-symbols-outlined text-primary">chevron_right</span>
+</div>
+</main>
+<div class="bottom-nav">
+<button class="nav-btn" onclick="setNav(this);navigate('screen-home')"><span class="material-symbols-outlined">home</span><span>Home</span></button>
+<button class="nav-btn" onclick="setNav(this);navigate('screen-scan-inventory')"><span class="material-symbols-outlined">qr_code_scanner</span><span>Scan</span></button>
+<button class="nav-btn active" onclick="setNav(this)"><span class="material-symbols-outlined">emoji_events</span><span>Missions</span></button>
+<button class="nav-btn" onclick="setNav(this);navigate('screen-wallet')"><span class="material-symbols-outlined">account_balance_wallet</span><span>Wallet</span></button>
+<button class="nav-btn" onclick="setNav(this);navigate('screen-dashboard')"><span class="material-symbols-outlined">analytics</span><span>More</span></button>
+</div>
+</div>
+
+<!-- SCREEN 23: REWARD WHEEL -->
+<div class="screen" id="screen-reward-wheel">
+<header class="sticky top-0 z-50 flex items-center justify-between px-5 py-4" style="background:rgba(11,15,14,.85);backdrop-filter:blur(12px)">
+<div class="flex items-center gap-3">
+<button onclick="goBack()"><span class="material-symbols-outlined text-primary">arrow_back</span></button>
+<span class="font-headline font-bold text-primary" style="letter-spacing:.05em">Obsidian Ledger</span>
+</div>
+<div class="flex items-center gap-3">
+<div style="background:rgba(255,255,255,.05);border:1px solid rgba(212,175,55,.3);padding:.2rem .7rem;border-radius:9999px"><span style="font-size:10px;font-weight:700;color:#FFD700;letter-spacing:.05em">GOLD TIER</span></div>
+<span class="material-symbols-outlined text-primary">account_balance_wallet</span>
+</div>
+</header>
+<main class="flex flex-col items-center px-5 pb-10">
+<h1 class="font-headline font-extrabold text-4xl mt-4 mb-1" style="text-shadow:0 2px 10px rgba(0,0,0,.5)">Spin the Wheel</h1>
+<p style="color:rgba(255,255,255,.5);font-size:.875rem;margin-bottom:1.5rem">Test your luck to multiply your rewards</p>
+<div style="position:relative;width:min(300px,85vw);aspect-ratio:1;margin-bottom:2rem">
+<div style="position:absolute;top:-8px;left:50%;transform:translateX(-50%);z-index:20;filter:drop-shadow(0 4px 8px rgba(0,0,0,.5))">
+<svg width="36" height="36" viewBox="0 0 40 40" fill="none">
+<path d="M20 40L38 5H2L20 40Z" fill="url(#gp)" stroke="#B8860B" stroke-width="1"/>
+<defs><linearGradient id="gp" x1="20" x2="20" y1="5" y2="40" gradientUnits="userSpaceOnUse"><stop stop-color="#FFD700"/><stop offset="1" stop-color="#B8860B"/></linearGradient></defs>
+</svg>
+</div>
+<canvas id="wheelCanvas" style="width:100%;height:100%;border-radius:50%;box-shadow:0 0 40px rgba(212,175,55,.2),inset 0 0 0 8px #B8860B"></canvas>
+</div>
+<div style="background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.08);border-radius:1rem;padding:1.25rem;width:100%;max-width:340px;margin-bottom:1.5rem">
+<div class="flex justify-between items-center mb-2">
+<span style="font-size:10px;font-weight:700;letter-spacing:.15em;color:rgba(255,255,255,.3);text-transform:uppercase">Daily Challenge</span>
+<span style="font-size:.875rem;font-weight:700;color:var(--primary)">2 / 3 Sales</span>
+</div>
+<div class="progress-bar" style="height:10px"><div class="progress-fill" style="width:67%"></div></div>
+</div>
+<button class="btn-gold" style="max-width:340px" id="spinBtn" onclick="spinWheel()"><span class="material-symbols-outlined">casino</span>Spin the Wheel</button>
+<div id="wheelResult" style="display:none;text-align:center;margin-top:1.5rem;padding:1.25rem;background:rgba(145,247,142,.08);border:1px solid rgba(145,247,142,.2);border-radius:1rem;width:100%;max-width:340px">
+<p style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--primary);margin-bottom:.5rem">You Won!</p>
+<p class="font-headline font-extrabold text-4xl text-primary" id="wheelResultText"></p>
+<p style="font-size:.8rem;color:var(--on-surface-variant);margin-top:.5rem">Credited to your wallet instantly</p>
+<button class="btn-primary mt-4" onclick="startConfetti();navigate('screen-level-up')">Continue <span class="material-symbols-outlined">arrow_forward</span></button>
+</div>
+</main>
+</div>
+
+<!-- SCREEN 24: UPLOAD INVOICE -->
+<div class="screen" id="screen-upload-invoice">
+<header class="p-5 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<button onclick="navigate('screen-scan-inventory',true)"><span class="material-symbols-outlined text-on-surface-variant">arrow_back</span></button>
+<div><h1 style="font-size:1.1rem;font-weight:600">Add Inventory</h1><p style="font-size:.7rem;color:#a8acaa">Upload distributor invoice</p></div>
+</div>
+<span style="font-size:.75rem;color:#a8acaa">Need help?</span>
+</header>
+<div class="flex gap-1.5 p-1 mx-5 mb-5" style="background:var(--surface-high);border-radius:.75rem">
+<button class="tab-btn" onclick="navigate('screen-scan-inventory')"><span class="material-symbols-outlined" style="font-size:14px">qr_code_scanner</span>Scan</button>
+<button class="tab-btn active"><span class="material-symbols-outlined" style="font-size:14px">upload_file</span>Invoice</button>
+<button class="tab-btn" onclick="navigate('screen-manual-entry')"><span class="material-symbols-outlined" style="font-size:14px">edit</span>Manual</button>
+</div>
+<main class="px-5 page-content space-y-5">
+<div class="upload-zone" id="uploadZone" onclick="simulateUpload()">
+<span class="material-symbols-outlined text-primary" style="font-size:2.5rem;margin-bottom:.75rem;display:block">cloud_upload</span>
+<h3 style="font-weight:500;font-size:.9rem;margin-bottom:.3rem">Upload Distributor Invoice</h3>
+<p style="font-size:.75rem;color:#6b7280;margin-bottom:1rem">PDF, JPG or PNG (Max 10MB)</p>
+<div style="display:inline-flex;align-items:center;gap:.35rem;padding:.4rem 1rem;border:1px solid rgba(145,247,142,.35);border-radius:9999px;color:var(--primary);font-size:.8rem;font-weight:600">Browse Files</div>
+</div>
+<div id="uploadedFile" style="display:none;background:var(--surface-high);border:1px solid rgba(145,247,142,.2);border-radius:.75rem;padding:.75rem 1rem;align-items:center;gap:.75rem">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings:'FILL' 1">description</span>
+<div class="flex-1"><p style="font-size:.875rem;font-weight:600">Invoice_Aug2024.pdf</p><p style="font-size:.7rem;color:var(--on-surface-variant)">2.4 MB • Uploaded</p></div>
+<span class="material-symbols-outlined text-primary" style="font-variation-settings:'FILL' 1">check_circle</span>
+</div>
+<div class="surface-card p-4">
+<h3 style="font-weight:700;font-size:.875rem;margin-bottom:.75rem">What we extract:</h3>
+<div class="space-y-2">
+<div class="flex items-center gap-2"><span class="material-symbols-outlined text-primary" style="font-size:16px;font-variation-settings:'FILL' 1">check_circle</span><span style="font-size:.8rem">Product names &amp; SKUs</span></div>
+<div class="flex items-center gap-2"><span class="material-symbols-outlined text-primary" style="font-size:16px;font-variation-settings:'FILL' 1">check_circle</span><span style="font-size:.8rem">Quantities &amp; batch numbers</span></div>
+<div class="flex items-center gap-2"><span class="material-symbols-outlined text-primary" style="font-size:16px;font-variation-settings:'FILL' 1">check_circle</span><span style="font-size:.8rem">Purchase prices &amp; distributor info</span></div>
+</div>
+</div>
+<button class="btn-primary" onclick="navigate('screen-add-inventory')"><span class="material-symbols-outlined">auto_read_play</span>Process Invoice with AI</button>
+</main>
+</div>
+
+<!-- SCREEN 25: STREAK -->
+<div class="screen" id="screen-streak">
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-5 h-16" style="background:var(--surface)">
+<div class="flex items-center gap-2">
+<div style="width:2rem;height:2rem;border-radius:50%;background:var(--surface-highest);display:flex;align-items:center;justify-content:center"><span class="material-symbols-outlined text-primary" style="font-size:14px">person</span></div>
+<span class="font-headline font-bold tracking-widest text-primary">OBSIDIAN LEDGER</span>
+</div>
+<div class="flex items-center gap-3">
+<button onclick="goBack()"><span class="material-symbols-outlined text-on-surface-variant">close</span></button>
+<span class="material-symbols-outlined text-primary">account_balance_wallet</span>
+</div>
+</header>
+<main class="pt-20 pb-32 px-5 max-w-lg mx-auto">
+<section class="text-center mb-8">
+<div style="display:inline-flex;align-items:center;gap:.35rem;padding:.2rem .75rem;background:var(--surface-high);border-radius:9999px;border:1px solid rgba(69,73,71,.2);margin-bottom:1rem">
+<span class="material-symbols-outlined text-primary" style="font-size:14px;font-variation-settings:'FILL' 1">local_fire_department</span>
+<span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--primary)">Current Progress</span>
+</div>
+<h1 class="font-headline font-bold leading-tight mb-2" style="font-size:2.2rem">Earning Streak:<br/><span style="color:var(--primary)">+ 4 Days in a Row!</span></h1>
+<p style="color:var(--on-surface-variant);font-size:.875rem;max-width:260px;margin:0 auto">Consistency is the key to the vault. Keep earning to unlock massive multipliers.</p>
+</section>
+<section style="position:relative;display:flex;justify-content:space-between;align-items:center;margin-bottom:2.5rem;padding:0 .25rem">
+<div style="position:absolute;top:50%;left:0;right:0;height:2px;background:var(--surface-highest);z-index:0;transform:translateY(-50%)"></div>
+<div style="position:absolute;top:50%;left:0;width:57%;height:2px;background:var(--primary);z-index:1;transform:translateY(-50%)"></div>
+<div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:.4rem">
+<div class="fire-day" style="width:3rem;height:3rem;border-radius:50%;background:linear-gradient(135deg,#91f78e,#52b555);display:flex;align-items:center;justify-content:center;border:2px solid rgba(145,247,142,.3)"><span class="font-headline font-bold" style="color:#005e17">1</span></div>
+<span style="font-size:9px;font-weight:700;text-transform:uppercase;color:var(--primary);letter-spacing:.1em">Day 1</span>
+</div>
+<div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:.4rem">
+<div class="fire-day" style="width:3rem;height:3rem;border-radius:50%;background:linear-gradient(135deg,#91f78e,#52b555);display:flex;align-items:center;justify-content:center;border:2px solid rgba(145,247,142,.3)"><span class="font-headline font-bold" style="color:#005e17">2</span></div>
+<span style="font-size:9px;font-weight:700;text-transform:uppercase;color:var(--primary);letter-spacing:.1em">Day 2</span>
+</div>
+<div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:.4rem">
+<div class="fire-day" style="width:3rem;height:3rem;border-radius:50%;background:linear-gradient(135deg,#91f78e,#52b555);display:flex;align-items:center;justify-content:center;border:2px solid rgba(145,247,142,.3)"><span class="font-headline font-bold" style="color:#005e17">3</span></div>
+<span style="font-size:9px;font-weight:700;text-transform:uppercase;color:var(--primary);letter-spacing:.1em">Day 3</span>
+</div>
+<div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:.4rem">
+<div class="fire-day" style="width:3.5rem;height:3.5rem;border-radius:50%;background:linear-gradient(135deg,#91f78e,#52b555);display:flex;align-items:center;justify-content:center;border:4px solid rgba(250,253,250,.1);box-shadow:0 0 0 6px rgba(145,247,142,.08)"><span class="font-headline font-extrabold text-xl" style="color:#005e17">4</span></div>
+<span style="font-size:9px;font-weight:700;text-transform:uppercase;color:var(--primary);letter-spacing:.1em">Today</span>
+</div>
+<div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:.4rem">
+<div style="width:3rem;height:3rem;border-radius:50%;background:var(--surface-high);display:flex;align-items:center;justify-content:center;border:1px solid rgba(69,73,71,.3)"><span class="material-symbols-outlined text-on-surface-variant" style="font-size:18px">lock</span></div>
+<span style="font-size:9px;font-weight:700;text-transform:uppercase;color:var(--on-surface-variant);letter-spacing:.1em">Day 5</span>
+</div>
+<div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:.4rem">
+<div style="width:3rem;height:3rem;border-radius:50%;background:var(--surface-high);display:flex;align-items:center;justify-content:center;border:1px solid rgba(69,73,71,.3)"><span class="material-symbols-outlined text-on-surface-variant" style="font-size:18px">lock</span></div>
+<span style="font-size:9px;font-weight:700;text-transform:uppercase;color:var(--on-surface-variant);letter-spacing:.1em">Day 7</span>
+</div>
+</section>
+<div class="surface-card p-5 mb-4">
+<div class="flex justify-between items-start mb-3">
+<div><p style="font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--primary)">Active Reward</p><h2 class="font-headline font-bold text-2xl">TODAY'S BONUS</h2></div>
+<div style="background:rgba(145,247,142,.1);padding:.25rem .75rem;border-radius:9999px"><span style="font-weight:700;font-size:1.1rem;color:var(--primary)">&#8377;10</span></div>
+</div>
+<p style="font-size:.8rem;color:var(--on-surface-variant);margin-bottom:1rem">Make 1 more verified sale to claim your streak bonus</p>
+<div class="progress-bar"><div class="progress-fill" style="width:50%"></div></div>
+</div>
+<div class="surface-card p-4 mb-4"><h3 style="font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--on-surface-variant);margin-bottom:.5rem">TOMORROW'S BONUS</h3><div class="flex justify-between items-center"><p style="font-weight:600">5-day streak reward</p><span style="font-weight:700;color:var(--primary)">&#8377;15</span></div></div>
+<div class="surface-card p-4 mb-6"><h3 style="font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--on-surface-variant);margin-bottom:.5rem">7-DAY GRAND PRIZE</h3><div class="flex justify-between items-center"><p style="font-weight:600">7-Day Streak Grand Prize</p><span style="font-weight:800;font-size:1.2rem;color:#FFD700;text-shadow:0 0 15px rgba(255,215,0,.4)">&#8377;50</span></div></div>
+<button class="btn-primary" onclick="navigate('screen-scan-sell')"><span class="material-symbols-outlined">bolt</span>Sell Now to Maintain Streak</button>
+</main>
+</div>
+
+<!-- SCREEN 26: LEVEL UP -->
+<div class="screen" id="screen-level-up">
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-5 h-16" style="background:#101413">
+<div class="flex items-center gap-3">
+<button onclick="navigate('screen-home')"><span class="material-symbols-outlined text-primary">arrow_back</span></button>
+<h1 class="font-headline font-semibold">Congrats!</h1>
+</div>
+<button onclick="showToast('Share coming soon!')"><span class="material-symbols-outlined">share</span></button>
+</header>
+<main class="pt-20 pb-10 px-5 max-w-md mx-auto">
+<section style="position:relative;border-radius:.85rem;overflow:hidden;margin-bottom:1.5rem;padding:1px;box-shadow:0 20px 50px rgba(0,0,0,.5)">
+<div style="position:absolute;inset:0;background:linear-gradient(135deg,#FFD700,#B8860B);opacity:.35"></div>
+<div style="position:relative;background:var(--surface-low);border-radius:.75rem;padding:1.5rem;display:flex;flex-direction:column;align-items:center;border:1px solid rgba(69,73,71,.2)">
+<h2 class="font-headline font-bold text-xl italic mb-5" style="color:#FFD700;text-shadow:0 0 15px rgba(255,215,0,.4)">Retailer Levels: 4 Days!</h2>
+<div style="position:relative;width:10rem;height:10rem;display:flex;align-items:center;justify-content:center;margin-bottom:1.5rem">
+<div style="position:absolute;inset:0;background:linear-gradient(135deg,#FFD700,#FDF5E6,#B8860B);border-radius:50%;box-shadow:inset 0 0 20px rgba(0,0,0,.5),0 10px 30px rgba(184,134,11,.4)"></div>
+<div style="position:relative;width:8rem;height:8rem;border-radius:50%;border:4px solid rgba(184,134,11,.3);display:flex;align-items:center;justify-content:center">
+<span class="material-symbols-outlined text-primary" style="font-size:3.5rem;font-variation-settings:'FILL' 1">military_tech</span>
+</div>
+</div>
+<p class="font-headline font-semibold text-lg" style="color:#FFD700;letter-spacing:.15em;text-transform:uppercase;margin-bottom:1.5rem;text-shadow:0 0 15px rgba(255,215,0,.4)">Silver Seller</p>
+<div class="surface-card w-full p-4">
+<div class="flex justify-between items-center mb-2"><span style="font-size:.875rem;font-weight:500">Earn &#8377;960 More</span><div style="background:rgba(145,247,142,.1);border-radius:9999px;padding:.2rem .6rem"><span style="font-size:10px;font-weight:700;color:var(--primary);text-transform:uppercase">+ 5% More Rewards</span></div></div>
+<div class="progress-bar"><div class="progress-fill" style="width:65%"></div></div>
+<div class="flex justify-between text-xs mt-2"><span style="color:var(--on-surface-variant)">Silver Seller</span><span style="color:var(--primary);font-weight:600">Gold Seller</span></div>
+</div>
+</div>
+</section>
+<div style="display:flex;align-items:center;justify-content:center;gap:.5rem;margin-bottom:1.5rem;padding:.75rem 1.5rem;border-radius:9999px;background:rgba(255,215,0,.05);border:1px solid rgba(255,215,0,.2)">
+<span class="material-symbols-outlined" style="font-size:16px;color:#FFD700;font-variation-settings:'FILL' 1">timer</span>
+<p style="font-size:.875rem;font-weight:700;color:#FFD700;text-shadow:0 0 15px rgba(255,215,0,.4)">1 Day Left &#x2022; &#8377;25 Bonus</p>
+</div>
+<section class="mb-8">
+<div class="flex items-center justify-between mb-3"><h3 style="font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--on-surface-variant)">Top Performers</h3><span style="font-size:.75rem;color:var(--primary);font-weight:600">View All</span></div>
+<div class="space-y-2">
+<div class="surface-card p-4 flex items-center justify-between"><div class="flex items-center gap-3"><span style="font-size:1.1rem;font-weight:700;color:var(--on-surface-variant);width:1.25rem">1</span><div style="width:2.5rem;height:2.5rem;border-radius:50%;background:var(--surface-high);display:flex;align-items:center;justify-content:center"><span class="material-symbols-outlined" style="font-size:18px;color:#a8acaa">person</span></div><span style="font-weight:500">Raje</span></div><span style="font-weight:700">&#8377;4,832</span></div>
+<div class="surface-card p-4 flex items-center justify-between"><div class="flex items-center gap-3"><span style="font-size:1.1rem;font-weight:700;color:var(--on-surface-variant);width:1.25rem">2</span><div style="width:2.5rem;height:2.5rem;border-radius:50%;background:var(--surface-high);display:flex;align-items:center;justify-content:center"><span class="material-symbols-outlined" style="font-size:18px;color:#a8acaa">person</span></div><span style="font-weight:500">Imran</span></div><span style="font-weight:700">&#8377;3,980</span></div>
+<div class="p-4 flex items-center justify-between" style="background:rgba(255,215,0,.08);border:1px solid rgba(255,215,0,.25);border-radius:1rem"><div class="flex items-center gap-3"><span style="font-size:1.1rem;font-weight:700;color:#FFD700;width:1.25rem">3</span><div style="width:2.5rem;height:2.5rem;border-radius:50%;background:var(--surface-high);border:2px solid #FFD700;display:flex;align-items:center;justify-content:center"><span class="material-symbols-outlined" style="font-size:18px;color:#FFD700">person</span></div><span style="font-weight:700;color:#FFD700">You (Ramesh)</span></div><span style="font-weight:700;color:#FFD700">&#8377;1,245</span></div>
+</div>
+</section>
+<button class="btn-primary" onclick="startConfetti();navigate('screen-home')"><span class="material-symbols-outlined">home</span>Back to Dashboard</button>
+</main>
+</div>
+
+</div><!-- /app-wrapper -->
+
+<script>
+// STATE
+const APP={currentScreen:'screen-login',history:[],balVisible:true,invQty:10,sellQty:1,selAmt:2500,spinning:false};
+const TXDATA=[
+{type:'sale',icon:'shopping_cart',color:'var(--primary)',label:'Sale Reward',sub:'IFFCO DAP x2',date:'Today, 2:34 PM',amount:'+\u20b927'},
+{type:'reward',icon:'casino',color:'#FFD700',label:'Wheel Spin Bonus',sub:'Daily reward',date:'Today, 11:00 AM',amount:'+\u20b925'},
+{type:'sale',icon:'shopping_cart',color:'var(--primary)',label:'Sale Reward',sub:'Urea 46%N x5',date:'Yesterday, 4:12 PM',amount:'+\u20b913.50'},
+{type:'withdrawal',icon:'send_money',color:'#f97316',label:'Bank Transfer',sub:'SBI XXXX 4512',date:'Dec 12, 3:00 PM',amount:'-\u20b91,000'},
+{type:'reward',icon:'local_fire_department',color:'#ff6b35',label:'Streak Bonus',sub:'3-day streak',date:'Dec 11, 9:00 AM',amount:'+\u20b98'},
+{type:'sale',icon:'shopping_cart',color:'var(--primary)',label:'Sale Reward',sub:'Gromor Amino x2',date:'Dec 10, 1:22 PM',amount:'+\u20b96.40'},
+{type:'withdrawal',icon:'account_balance',color:'#f97316',label:'Bank Transfer',sub:'SBI XXXX 4512',date:'Dec 8, 5:00 PM',amount:'-\u20b9954'},
+{type:'reward',icon:'redeem',color:'var(--secondary)',label:'Mission Reward',sub:'Complete 3 scans',date:'Dec 7, 12:00 PM',amount:'+\u20b910'},
+];
+
+function navigate(id,back=false){
+const cur=document.querySelector('.screen.active');
+const tgt=document.getElementById(id);
+if(!tgt||cur===tgt)return;
+APP.history.push(APP.currentScreen);
+APP.currentScreen=id;
+cur.classList.remove('active');
+tgt.classList.add('active');
+tgt.classList.add(back?'slide-back':'slide-in');
+setTimeout(()=>tgt.classList.remove('slide-in','slide-back'),320);
+tgt.scrollTop=0;
+if(id==='screen-transactions')renderTx('all');
+if(id==='screen-reward-wheel')initWheel();
+if(id==='screen-confirm-earn')startOTPTimer();
+}
+
+function goBack(){if(APP.history.length>0){const p=APP.history.pop();navigate(p,true);}}
+function setNav(btn){document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
+
+let toastT;
+function showToast(m,d=2800){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),d);}
+
+function handleLogin(){const p=document.getElementById('loginPhone').value.trim();if(p.length<10&&p!=''){showToast('Enter a valid 10-digit number');return;}document.getElementById('otpSection').style.display='block';document.getElementById('otp1').focus();showToast('OTP sent! Demo: 1234');}
+function otpNext(i,n){if(i.value){i.classList.add('filled');if(n)document.getElementById(n).focus();}}
+function verifyOTP(){const otp=['otp1','otp2','otp3','otp4'].map(id=>document.getElementById(id).value).join('');if(otp==='1234'){showToast('Login successful!');setTimeout(()=>navigate('screen-setup-shop'),600);}else showToast('Wrong OTP. Try: 1234');}
+
+function selectDoc(t){['GST','MSME','PAN'].forEach(d=>{const c=document.getElementById('doc'+d),ch=document.getElementById('doc'+d+'Check');if(d===t){c.classList.add('selected');ch.textContent='check_circle';ch.style.color='var(--primary)';ch.style.fontVariationSettings="'FILL' 1";}else{c.classList.remove('selected');ch.textContent='radio_button_unchecked';ch.style.color='var(--outline-variant)';ch.style.fontVariationSettings="'FILL' 0";}});}
+
+function selectPayout(t){['UPI','Bank','Wallet'].forEach(d=>{const c=document.getElementById('pay'+d),ch=document.getElementById('pay'+d+'Check');if(d===t){c.style.borderColor='var(--primary)';c.style.background='rgba(145,247,142,.04)';ch.textContent='check_circle';ch.style.color='var(--primary)';ch.style.fontVariationSettings="'FILL' 1";}else{c.style.borderColor='rgba(69,73,71,.3)';c.style.background='var(--surface-high)';ch.textContent='radio_button_unchecked';ch.style.color='var(--outline-variant)';ch.style.fontVariationSettings="'FILL' 0";}});}
+
+function toggleBalance(){APP.balVisible=!APP.balVisible;const v=APP.balVisible?'\u20b91,245.50':'\u20b9 \u2022\u2022\u2022\u2022\u2022\u2022';['homeWalletBal','walletBalance'].forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=v;});}
+
+function adjustQty(d){APP.invQty=Math.max(1,APP.invQty+d);document.getElementById('invQty').textContent=APP.invQty;const l=document.getElementById('addQtyLabel');if(l)l.textContent=APP.invQty;}
+function adjustSellQty(d){APP.sellQty=Math.max(1,APP.sellQty+d);const p=1350,t=p*APP.sellQty;document.getElementById('sellQty').textContent=APP.sellQty;document.getElementById('sellTotal').textContent='\u20b9'+t.toLocaleString('en-IN');document.getElementById('sellReward').textContent='\u20b9'+(t*.01).toFixed(2);}
+function selectAmt(btn,v){document.querySelectorAll('.amount-btn').forEach(b=>b.classList.remove('selected'));btn.classList.add('selected');APP.selAmt=parseInt(v);}
+
+function renderTx(filter){
+const list=document.getElementById('txList');if(!list)return;
+const filtered=filter==='all'?TXDATA:TXDATA.filter(t=>t.type===filter);
+list.innerHTML=filtered.map(tx=>`<div class="tx-item"><div style="width:2.5rem;height:2.5rem;border-radius:50%;background:rgba(255,255,255,.04);border:1px solid rgba(69,73,71,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0"><span class="material-symbols-outlined" style="font-size:18px;color:${tx.color};font-variation-settings:'FILL' 1">${tx.icon}</span></div><div class="flex-1 min-w-0"><p style="font-size:.875rem;font-weight:600;margin-bottom:.15rem">${tx.label}</p><p style="font-size:.7rem;color:var(--on-surface-variant)">${tx.sub}</p><p style="font-size:.65rem;color:var(--outline)">${tx.date}</p></div><span style="font-size:.95rem;font-weight:700;color:${tx.amount.startsWith('+')? 'var(--primary)':'#f97316'};white-space:nowrap">${tx.amount}</span></div>`).join('');}
+
+function filterTx(btn,t){document.querySelectorAll('#screen-transactions .tab-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderTx(t);}
+
+let otpInt;
+function startOTPTimer(){let s=45;const el=document.getElementById('otpTimer');clearInterval(otpInt);otpInt=setInterval(()=>{s--;if(el)el.textContent=`00:${s.toString().padStart(2,'0')}`;if(s<=0){clearInterval(otpInt);if(el)el.textContent='Resend OTP';}},1000);}
+function saleOtpNext(i,n){if(i.value){i.classList.add('filled');if(n)document.getElementById(n).focus();}}
+function completeSale(){const otp=['sotp1','sotp2','sotp3','sotp4','sotp5','sotp6'].map(id=>{const e=document.getElementById(id);return e?e.value:'';}).join('');if(otp==='673421'||otp.length===6){clearInterval(otpInt);showToast('Sale confirmed! \u20b925.70 credited!');setTimeout(()=>{startConfetti();navigate('screen-level-up');},800);}else showToast('Wrong OTP. Demo: 673421');}
+
+function addDone(){showToast(`${APP.invQty} units added & \u20b95 scan reward earned!`);setTimeout(()=>navigate('screen-home'),700);}
+
+function simulateUpload(){const z=document.getElementById('uploadZone'),f=document.getElementById('uploadedFile');if(z)z.innerHTML='<span class="material-symbols-outlined text-primary" style="font-size:2rem;display:block;margin:0 auto .5rem">sync</span><p>Uploading...</p>';setTimeout(()=>{if(z)z.style.display='none';if(f){f.style.display='flex';showToast('Invoice uploaded! AI processing...');}},1500);}
+
+// WHEEL
+const SEGS=[{l:'\u20b95',c:'#1a3d1f'},{l:'2X',c:'#1f3a1a'},{l:'??',c:'#2a1a3d'},{l:'\u20b920',c:'#1a2e3d'},{l:'\u20b925',c:'#3d1a1a'},{l:'5X',c:'#1a3d2e'},{l:'\u20b912',c:'#2e2e1a'},{l:'\u20b922',c:'#1f1a3d'},{l:'?',c:'#3d2a1a'},{l:'\u20b910',c:'#1a3d1a'}];
+let wheelRot=0;
+
+function initWheel(){
+const canvas=document.getElementById('wheelCanvas');if(!canvas)return;
+const dpr=window.devicePixelRatio||1;
+const sz=Math.min(canvas.parentElement.clientWidth||280,280);
+canvas.width=sz*dpr;canvas.height=sz*dpr;
+canvas.style.width=sz+'px';canvas.style.height=sz+'px';
+const ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);
+drawWheel(ctx,sz,wheelRot);
+}
+
+function drawWheel(ctx,sz,rot){
+const cx=sz/2,cy=sz/2,r=sz/2-4,sa=(2*Math.PI)/SEGS.length;
+ctx.clearRect(0,0,sz,sz);
+SEGS.forEach((seg,i)=>{
+const s=rot+i*sa-Math.PI/2,e=s+sa;
+ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,s,e);ctx.closePath();
+ctx.fillStyle=seg.c;ctx.fill();
+ctx.strokeStyle='rgba(255,215,0,.15)';ctx.lineWidth=1;ctx.stroke();
+ctx.save();ctx.translate(cx,cy);ctx.rotate(s+sa/2);ctx.textAlign='right';
+ctx.fillStyle='#91f78e';ctx.font=`bold ${sz*.056}px Manrope,sans-serif`;
+ctx.fillText(seg.l,r*.78,sz*.018);ctx.restore();
+});
+ctx.beginPath();ctx.arc(cx,cy,sz*.1,0,2*Math.PI);ctx.fillStyle='#B8860B';ctx.fill();
+ctx.beginPath();ctx.arc(cx,cy,sz*.06,0,2*Math.PI);ctx.fillStyle='#FFD700';ctx.fill();
+ctx.beginPath();ctx.arc(cx,cy,r,0,2*Math.PI);ctx.strokeStyle='#B8860B';ctx.lineWidth=6;ctx.stroke();
+}
+
+function spinWheel(){
+if(APP.spinning)return;APP.spinning=true;
+const btn=document.getElementById('spinBtn');if(btn)btn.textContent='Spinning...';
+document.getElementById('wheelResult').style.display='none';
+const canvas=document.getElementById('wheelCanvas');if(!canvas)return;
+const dpr=window.devicePixelRatio||1,sz=canvas.width/dpr,ctx=canvas.getContext('2d');
+const tgt=Math.floor(Math.random()*SEGS.length);
+const sa=(2*Math.PI)/SEGS.length;
+const ang=(5+Math.random()*3)*2*Math.PI+(SEGS.length-tgt)*sa+sa*.5;
+const dur=4000,t0=performance.now(),r0=wheelRot;
+function animate(now){
+const p=Math.min((now-t0)/dur,1),ease=1-Math.pow(1-p,3);
+wheelRot=r0+ang*ease;
+ctx.setTransform(dpr,0,0,dpr,0,0);drawWheel(ctx,sz,wheelRot);
+if(p<1){requestAnimationFrame(animate);}
+else{APP.spinning=false;const res=SEGS[tgt];document.getElementById('wheelResultText').textContent=res.l;document.getElementById('wheelResult').style.display='block';if(btn)btn.innerHTML='<span class="material-symbols-outlined">casino</span>Spin Again';showToast('You won '+res.l+'!');}
+}
+requestAnimationFrame(animate);
+}
+
+// CONFETTI
+function startConfetti(){
+const canvas=document.getElementById('confettiCanvas');if(!canvas)return;
+canvas.style.display='block';const ctx=canvas.getContext('2d');
+canvas.width=window.innerWidth;canvas.height=window.innerHeight;
+const P=Array.from({length:100},()=>({x:Math.random()*canvas.width,y:Math.random()*canvas.height-canvas.height,w:5+Math.random()*9,h:4+Math.random()*5,color:['#91f78e','#FFD700','#86faac','#90f1ff','#ffffff','#52b555'][Math.floor(Math.random()*6)],vx:(Math.random()-.5)*4,vy:2+Math.random()*4,rot:Math.random()*Math.PI*2,rv:(Math.random()-.5)*.15,op:1}));
+let fr=0;
+function draw(){ctx.clearRect(0,0,canvas.width,canvas.height);P.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.rot+=p.rv;if(fr>60)p.op-=.012;ctx.save();ctx.globalAlpha=Math.max(0,p.op);ctx.translate(p.x,p.y);ctx.rotate(p.rot);ctx.fillStyle=p.color;ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);ctx.restore();});fr++;if(fr<140)requestAnimationFrame(draw);else canvas.style.display='none';}
+draw();
+}
+
+document.addEventListener('DOMContentLoaded',()=>{renderTx('all');});
+</script>
+</body>
+</html>
