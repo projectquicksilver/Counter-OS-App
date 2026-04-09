@@ -14,23 +14,19 @@ tailwind.config={darkMode:"class",theme:{extend:{colors:{"surface-container-lowe
 :root{--primary:#91f78e;--primary-dark:#52b555;--surface:#0b0f0e;--surface-low:#101413;--surface-high:#1b211f;--surface-highest:#212725;--on-surface:#fafdfa;--on-surface-variant:#a8acaa;--outline-variant:#454947;--secondary:#86faac;--tertiary:#90f1ff;--gold:#FFD700}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 /* ── MOBILE SHELL ── */
-html,body{height:100%;margin:0;padding:0;background:#000;display:flex;justify-content:center;align-items:flex-start;overflow:hidden}
-.app-wrapper{position:relative;width:100%;max-width:480px;height:100vh;overflow:hidden;background:var(--surface);box-shadow:0 0 80px rgba(0,0,0,.9);flex-shrink:0}
-/* All screens live INSIDE the wrapper as absolute layers */
-.screen{display:none;position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;background:var(--surface);z-index:10;flex-direction:column}
+html{height:100%;background:#000}
+body{min-height:100%;margin:0;padding:0;background:#111;display:flex;justify-content:center;color:var(--on-surface);font-family:'Inter',sans-serif;overflow-x:hidden}
+.app-wrapper{position:relative;width:100%;max-width:480px;height:100vh;background:var(--surface);box-shadow:0 0 80px rgba(0,0,0,.9)}
+/* Screens fill the wrapper */
+.screen{display:none;position:absolute;top:0;left:0;right:0;bottom:0;overflow-y:auto;overflow-x:hidden;background:var(--surface);z-index:10;flex-direction:column}
 .screen.active{display:flex}
-/* Headers that were "fixed" must now be sticky within the screen scroll container */
-.screen header.fixed,
-.screen header[class*="fixed"]{position:sticky!important;top:0!important;left:auto!important;right:auto!important;width:100%!important;z-index:50}
-/* Bottom nav sits at the bottom of the wrapper, not the viewport */
-.bottom-nav{position:absolute;bottom:0;left:0;right:0;width:100%;background:var(--surface-high);border-top:1px solid rgba(69,73,71,.3);display:flex;z-index:100}
-/* Toast anchored inside wrapper */
-#toast{position:absolute;bottom:5rem;left:50%;transform:translateX(-50%) translateY(100px);background:var(--surface-highest);color:var(--on-surface);padding:.75rem 1.25rem;border-radius:.75rem;font-size:.85rem;font-weight:500;z-index:9999;border:1px solid rgba(69,73,71,.4);transition:transform .3s cubic-bezier(.4,0,.2,1);white-space:nowrap;pointer-events:none;box-shadow:0 10px 30px rgba(0,0,0,.4);max-width:90%}
+/* Bottom nav pinned to bottom of wrapper */
+.bottom-nav{position:sticky;bottom:0;left:0;right:0;width:100%;background:var(--surface-high);border-top:1px solid rgba(69,73,71,.3);display:flex;z-index:100;margin-top:auto}
+/* Toast */
+#toast{position:fixed;bottom:5rem;left:50%;transform:translateX(-50%) translateY(100px);background:var(--surface-highest);color:var(--on-surface);padding:.75rem 1.25rem;border-radius:.75rem;font-size:.85rem;font-weight:500;z-index:9999;border:1px solid rgba(69,73,71,.4);transition:transform .3s cubic-bezier(.4,0,.2,1);white-space:nowrap;pointer-events:none;box-shadow:0 10px 30px rgba(0,0,0,.4);max-width:90vw}
 #toast.show{transform:translateX(-50%) translateY(0)}
-/* Confetti inside wrapper */
-#confettiCanvas{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:200;display:none}
-/* ── REST OF STYLES ── */
-body{color:var(--on-surface);font-family:'Inter',sans-serif}
+/* Confetti */
+#confettiCanvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:200;display:none}
 .material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;display:inline-block;line-height:1;vertical-align:middle}
 .slide-in{animation:slideIn .28s cubic-bezier(.4,0,.2,1) forwards}
 .slide-back{animation:slideBack .28s cubic-bezier(.4,0,.2,1) forwards}
